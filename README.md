@@ -71,7 +71,7 @@ Go to the [milestones tab](../../milestone/1) to track your progress.
 
 ### Description
 
-**Required:** update [your repository](https://stackoverflow.com/questions/7757751/how-do-you-change-a-repository-description-on-github) with a short description of your project.
+ballzone - 2D (top-down perspective) real-time game with 2 teams where players try to score a goal and win (like in soccer or hockey).
 
 ### Mockups
 
