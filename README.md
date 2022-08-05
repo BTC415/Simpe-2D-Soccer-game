@@ -73,6 +73,27 @@ Go to the [milestones tab](../../milestone/1) to track your progress.
 
 ballzone - 2D (top-down perspective) real-time game with 2 teams where players try to score a goal and win (like in soccer or hockey).
 
+Sprint 1:
+- Creating room and receiving id
+- Rendering board where player can move
+- Moving via keys (WSAD)
+
+Sprint 2:
+- Joining other room by id and connecting with all players
+- Real-time moving
+- Collisions with other players
+
+Sprint 3:
+- Ball
+- Ball physics:
+    - Moving ball when collision with it is detected
+    - Shooting ball when player is close enough and space key is pressed
+- Scoring system
+- End match when time is over
+- Math results (which team won, how many scores per player, etc.)
+
+In v1 version you will be able to create room match and other players will be able to join it. When match starts you will move via keys. All players and ball will move with you in real-time and when someone will score a goal system will detect that and give a point to a team. Match ends when time has elapsed and everyone sees results.
+
 ### Mockups
 
 *View `README.md` to see how to replace me with mockups.*
