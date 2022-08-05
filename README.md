@@ -96,5 +96,6 @@ In v1 version you will be able to create room match and other players will be ab
 
 ### Mockups
 
-| ![Home page](/mockups/home.jpg) | ![Game page](/mockups/game.jpg) |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------- |
+![Home page](/mockups/home.jpg)
+![Game page](/mockups/game.jpg)
+![Statistics](/mockups/stats.jpg)
