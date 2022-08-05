@@ -96,8 +96,5 @@ In v1 version you will be able to create room match and other players will be ab
 
 ### Mockups
 
-*View `README.md` to see how to replace me with mockups.*
-
-| ![Benjamin Bannekat](/mockups/github-cat.png) | ![Benjamin Bannekat](/mockups/github-cat.png) |
+| ![Home page](/mockups/home.jpg) | ![Game page](/mockups/game.jpg) |
 | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| ![Benjamin Bannekat](/mockups/github-cat.png) | ![Benjamin Bannekat](/mockups/github-cat.png) |
