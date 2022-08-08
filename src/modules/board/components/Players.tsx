@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { BOARD_SIZE, PLAYER_SIZE } from '@/common/constants/settings';
+import { BOARD_SIZE, MOVE, PLAYER_SIZE } from '@/common/constants/settings';
+
+let xTreshold = 0;
+let yTreshold = 0;
 
 const Players = () => {
   const [position, setPosition] = useState({ x: 50, y: 50 });
@@ -62,23 +65,39 @@ const Players = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const { x, y } = position;
+      if (direction.x === 1) {
+        xTreshold = Math.min(xTreshold + MOVE.ACCELERATION, MOVE.MAX_SPEED);
+      } else if (direction.x === -1) {
+        xTreshold = Math.max(xTreshold - MOVE.ACCELERATION, -MOVE.MAX_SPEED);
+      } else if (xTreshold > 0) {
+        xTreshold = Math.max(xTreshold - MOVE.DECELERATION, 0);
+      } else if (xTreshold < 0) {
+        xTreshold = Math.min(xTreshold + MOVE.DECELERATION, 0);
+      }
 
-      const newX = x + direction.x * 2;
-      const newY = y + direction.y * 2;
+      if (direction.y === 1) {
+        yTreshold = Math.min(yTreshold + MOVE.ACCELERATION, MOVE.MAX_SPEED);
+      } else if (direction.y === -1) {
+        yTreshold = Math.max(yTreshold - MOVE.ACCELERATION, -MOVE.MAX_SPEED);
+      } else if (yTreshold > 0) {
+        yTreshold = Math.max(yTreshold - MOVE.DECELERATION, 0);
+      } else if (yTreshold < 0) {
+        yTreshold = Math.min(yTreshold + MOVE.DECELERATION, 0);
+      }
+
+      const newX = Math.max(
+        Math.min(position.x + xTreshold, BOARD_SIZE.width - PLAYER_SIZE),
+        PLAYER_SIZE
+      );
+      const newY = Math.max(
+        Math.min(position.y + yTreshold, BOARD_SIZE.width - PLAYER_SIZE),
+        PLAYER_SIZE
+      );
 
       setPosition((prev) => ({
         ...prev,
-
-        x: Math.max(
-          Math.min(newX, BOARD_SIZE.width - PLAYER_SIZE),
-          PLAYER_SIZE
-        ),
-
-        y: Math.max(
-          Math.min(newY, BOARD_SIZE.height - PLAYER_SIZE),
-          PLAYER_SIZE
-        ),
+        x: newX,
+        y: newY,
       }));
     }, 15.625);
 
