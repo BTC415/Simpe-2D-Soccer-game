@@ -3,13 +3,29 @@
 @tailwind utilities;
 
 * {
-  @apply font-montserrat font-medium;
+  @apply font-montserrat font-semibold text-white ring-green-500 focus:outline-none focus:ring;
+}
+
+@layer components {
+  .input {
+    @apply h-8 w-72 rounded-lg bg-zinc-500/40 px-4;
+  }
+
+  .gradient {
+    @apply bg-gradient-to-r from-lime-500 to-emerald-500;
+  }
+
+  .btn {
+    @apply gradient block h-8 w-72 rounded-lg font-extrabold text-black transition-opacity hover:opacity-75 active:opacity-100;
+  }
 }
 
 body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
+  background-color: #0f0f0f;
 }
+
 html {
   height: -webkit-fill-available;
 }

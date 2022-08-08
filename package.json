@@ -10,6 +10,8 @@
     "next": "^12.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
