@@ -18,6 +18,23 @@ const Background = () => {
 
           darker = !darker;
         }
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(
+          BOARD_SIZE.width / 2,
+          BOARD_SIZE.height / 2,
+          125,
+          0,
+          Math.PI * 2
+        );
+        ctx.stroke();
+
+        ctx.moveTo(BOARD_SIZE.width / 2, 0);
+        ctx.lineTo(BOARD_SIZE.width / 2, BOARD_SIZE.height);
+        ctx.stroke();
+        ctx.closePath();
       }
     }
   }, []);
@@ -27,7 +44,7 @@ const Background = () => {
       ref={ref}
       width={BOARD_SIZE.width}
       height={BOARD_SIZE.height}
-      className="absolute"
+      className="absolute overflow-hidden rounded-lg"
     />
   );
 };

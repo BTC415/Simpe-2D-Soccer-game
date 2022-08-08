@@ -2,112 +2,91 @@ import { useEffect, useRef, useState } from 'react';
 
 import { BOARD_SIZE, MOVE, PLAYER_SIZE } from '@/common/constants/settings';
 
-let xTreshold = 0;
-let yTreshold = 0;
+import { makePosition } from '../helpers/makePosition';
+import { useKeysDirection } from '../hooks/useKeysDirection';
+
+const velocityVector = { x: 0, y: 0 };
 
 const Players = () => {
-  const [position, setPosition] = useState({ x: 50, y: 50 });
-  const [direction, setDirection] = useState<{ x: -1 | 0 | 1; y: -1 | 0 | 1 }>({
-    x: 0,
-    y: 0,
-  });
-
   const ref = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat) return;
-      switch (e.key) {
-        case 'w':
-          setDirection((prev) => ({ ...prev, y: -1 }));
-          break;
-        case 's':
-          setDirection((prev) => ({ ...prev, y: 1 }));
-          break;
-        case 'a':
-          setDirection((prev) => ({ ...prev, x: -1 }));
-          break;
-        case 'd':
-          setDirection((prev) => ({ ...prev, x: 1 }));
-          break;
-        default:
-          break;
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'w':
-          if (direction.y === -1) setDirection((prev) => ({ ...prev, y: 0 }));
-          break;
-        case 's':
-          if (direction.y === 1) setDirection((prev) => ({ ...prev, y: 0 }));
-          break;
-        case 'a':
-          if (direction.x === -1) setDirection((prev) => ({ ...prev, x: 0 }));
-          break;
-        case 'd':
-          if (direction.x === 1) setDirection((prev) => ({ ...prev, x: 0 }));
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
+  const [player1, setPlayer1] = useState({
+    x: 200,
+    y: 200,
   });
+  const [position, setPosition] = useState({ x: 50, y: 50 });
+
+  const direction = useKeysDirection();
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (direction.x === 1) {
-        xTreshold = Math.min(xTreshold + MOVE.ACCELERATION, MOVE.MAX_SPEED);
+        velocityVector.x = Math.min(
+          velocityVector.x + MOVE.ACCELERATION,
+          MOVE.MAX_SPEED
+        );
       } else if (direction.x === -1) {
-        xTreshold = Math.max(xTreshold - MOVE.ACCELERATION, -MOVE.MAX_SPEED);
-      } else if (xTreshold > 0) {
-        xTreshold = Math.max(xTreshold - MOVE.DECELERATION, 0);
-      } else if (xTreshold < 0) {
-        xTreshold = Math.min(xTreshold + MOVE.DECELERATION, 0);
+        velocityVector.x = Math.max(
+          velocityVector.x - MOVE.ACCELERATION,
+          -MOVE.MAX_SPEED
+        );
+      } else if (velocityVector.x > 0) {
+        velocityVector.x = Math.max(velocityVector.x - MOVE.DECELERATION, 0);
+      } else if (velocityVector.x < 0) {
+        velocityVector.x = Math.min(velocityVector.x + MOVE.DECELERATION, 0);
       }
 
       if (direction.y === 1) {
-        yTreshold = Math.min(yTreshold + MOVE.ACCELERATION, MOVE.MAX_SPEED);
+        velocityVector.y = Math.min(
+          velocityVector.y + MOVE.ACCELERATION,
+          MOVE.MAX_SPEED
+        );
       } else if (direction.y === -1) {
-        yTreshold = Math.max(yTreshold - MOVE.ACCELERATION, -MOVE.MAX_SPEED);
-      } else if (yTreshold > 0) {
-        yTreshold = Math.max(yTreshold - MOVE.DECELERATION, 0);
-      } else if (yTreshold < 0) {
-        yTreshold = Math.min(yTreshold + MOVE.DECELERATION, 0);
+        velocityVector.y = Math.max(
+          velocityVector.y - MOVE.ACCELERATION,
+          -MOVE.MAX_SPEED
+        );
+      } else if (velocityVector.y > 0) {
+        velocityVector.y = Math.max(velocityVector.y - MOVE.DECELERATION, 0);
+      } else if (velocityVector.y < 0) {
+        velocityVector.y = Math.min(velocityVector.y + MOVE.DECELERATION, 0);
       }
 
-      const newX = Math.max(
-        Math.min(position.x + xTreshold, BOARD_SIZE.width - PLAYER_SIZE),
-        PLAYER_SIZE
-      );
-      const newY = Math.max(
-        Math.min(position.y + yTreshold, BOARD_SIZE.width - PLAYER_SIZE),
-        PLAYER_SIZE
+      const newPosition = makePosition(
+        position.x + velocityVector.x,
+        position.y + velocityVector.y
       );
 
-      setPosition((prev) => ({
-        ...prev,
-        x: newX,
-        y: newY,
-      }));
+      const distanceX = newPosition.x - player1.x;
+      const distanceY = newPosition.y - player1.y;
+      const length = Math.sqrt(distanceX ** 2 + distanceY ** 2) || 1;
+
+      if (length < 61) {
+        const unitX = distanceX / length;
+        const unitY = distanceY / length;
+
+        const collisionPosition = makePosition(
+          player1.x + 61 * unitX,
+          player1.y + 61 * unitY
+        );
+
+        const newPlayer1 = makePosition(player1.x - unitX, player1.y - unitY);
+
+        setPosition(collisionPosition);
+        setPlayer1(newPlayer1);
+      } else {
+        setPosition(newPosition);
+      }
     }, 15.625);
 
     return () => clearInterval(interval);
-  }, [direction, position]);
+  }, [direction, position, player1]);
 
   useEffect(() => {
     if (ref.current) {
       const ctx = ref.current.getContext('2d');
       if (ctx) {
+        ctx.lineWidth = 2;
         ctx.clearRect(0, 0, BOARD_SIZE.width, BOARD_SIZE.height);
         ctx.fillStyle = '#3b82f6';
         ctx.strokeStyle = '#000';
@@ -115,9 +94,17 @@ const Players = () => {
         ctx.arc(position.x, position.y, PLAYER_SIZE, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
+        ctx.closePath();
+
+        ctx.fillStyle = '#EF4444';
+        ctx.beginPath();
+        ctx.arc(player1.x, player1.y, PLAYER_SIZE, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
       }
     }
-  }, [position.x, position.y]);
+  }, [position.x, position.y, player1]);
 
   return (
     <canvas
