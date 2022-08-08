@@ -67,7 +67,7 @@ Go to the [milestones tab](../../milestone/1) to track your progress.
 
 ### Public URL
 
-[Replace me with the link to your app's URL](https://www.google.com/)
+[https://ballzone.herokuapp.com](https://ballzone.herokuapp.com)
 
 ### Description
 
