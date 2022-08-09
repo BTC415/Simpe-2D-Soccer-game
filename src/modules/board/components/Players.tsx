@@ -28,21 +28,22 @@ const Players = () => {
         ctx.clearRect(0, 0, BOARD_SIZE.width, BOARD_SIZE.height);
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000';
-        ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
-        ctx.textAlign = 'center';
 
-        game?.players.forEach(({ position: { x, y }, name }) => {
-          ctx.fillStyle = '#3b82f6';
+        game?.players.forEach(({ position: { x, y }, team }) => {
+          ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
 
           ctx.beginPath();
           ctx.arc(x, y, PLAYER_SIZE, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
-
-          ctx.fillStyle = '#fff';
-          ctx.fillText(name, x, y + PLAYER_SIZE + 20);
-
           ctx.closePath();
+        });
+
+        ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#fff';
+        game?.players.forEach(({ position: { x, y }, name }) => {
+          ctx.fillText(name, x, y + PLAYER_SIZE + 20);
         });
       }
     }

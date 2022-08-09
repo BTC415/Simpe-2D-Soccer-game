@@ -10,5 +10,6 @@ export interface ClientToServer {
 
 export interface ServerToClient {
   game_joined: (gameId: string) => void;
+  game_not_found: () => void;
   update: (game: GameClient) => void;
 }

@@ -8,7 +8,7 @@ import type {
   ServerToClient,
 } from '@/common/types/socket.type';
 
-import { TICKRATE } from './constants/settings';
+import { BOARD_SIZE, TICKRATE } from './constants/settings';
 import { handlePlayersMovement } from './helpers/handlePlayersMovement';
 
 type PlayerJoin = {
@@ -105,7 +105,13 @@ export class GameServer {
   }
 
   private joinGame({ socketId, name }: PlayerJoin, gameId: string) {
-    if (this.getGame(gameId)?.players.get(socketId)) return;
+    const game = this.getGame(gameId);
+    if (!game) {
+      this.io.to(socketId).emit('game_not_found');
+      return;
+    }
+
+    if (game.players.get(socketId)) return;
 
     this.addPlayerToGame({ socketId, name }, gameId);
 
@@ -121,9 +127,10 @@ export class GameServer {
       id: socketId,
       name: !name ? `Player ${game.players.size + 1}` : name,
       position: {
-        x: game.players.size ? 400 : 50,
-        y: game.players.size ? 200 : 50,
+        x: game.players.size % 2 === 1 ? BOARD_SIZE.width - 200 : 200,
+        y: BOARD_SIZE.height / 2,
       },
+      team: game.players.size % 2 === 1 ? 'red' : 'blue',
       direction: { x: 0, y: 0 },
       velocityVector: { x: 0, y: 0 },
     });

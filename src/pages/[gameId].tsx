@@ -8,11 +8,14 @@ import Board from '@/modules/board';
 import GameInfo from '@/modules/gameInfo';
 
 const GamePage: NextPage = () => {
-  const { gameId } = useRouter().query;
+  const router = useRouter();
 
   useEffect(() => {
+    const { gameId } = router.query;
     if (gameId) socket.emit('join_game', '', gameId.toString());
-  }, [gameId]);
+
+    socket.on('game_not_found', () => router.push('/'));
+  }, [router]);
 
   return (
     <div>
