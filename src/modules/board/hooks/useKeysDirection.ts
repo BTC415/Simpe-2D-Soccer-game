@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
+import { socket } from '@/common/libs/socket';
+import type { Direction } from '@/common/types/player.type';
+
 export const useKeysDirection = () => {
-  const [direction, setDirection] = useState<{ x: -1 | 0 | 1; y: -1 | 0 | 1 }>({
+  const [direction, setDirection] = useState<Direction>({
     x: 0,
     y: 0,
   });
@@ -55,5 +58,7 @@ export const useKeysDirection = () => {
     };
   });
 
-  return direction;
+  useEffect(() => {
+    socket.emit('change_direction', direction);
+  }, [direction]);
 };

@@ -10,15 +10,17 @@ const GameInputs = ({ name }: { name: string }) => {
   const router = useRouter();
 
   useEffect(() => {
-    socket.on('game_created', (serverGameId) => router.push(serverGameId));
+    socket.on('game_joined', (serverGameId) => router.push(serverGameId));
 
     return () => {
-      socket.off('game_created');
+      socket.off('game_joined');
     };
   }, [router]);
 
   const handleJoinGame = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    socket.emit('join_game', name, gameId);
   };
 
   const handleCreateGame = () => {

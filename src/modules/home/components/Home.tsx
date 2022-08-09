@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { socket } from '@/common/libs/socket';
 
 import GameInputs from './GameInputs';
 import Header from './Header';
 
 const Home = () => {
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    socket.emit('leave_game');
+  }, []);
 
   return (
     <div className="flex justify-center py-24">

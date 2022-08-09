@@ -1,4 +1,4 @@
-import { BOARD_SIZE, PLAYER_SIZE } from '@/common/constants/settings';
+import { BOARD_SIZE, PLAYER_SIZE } from '../constants/settings';
 
 export const makePosition = (x: number, y: number) => {
   const newX = Math.max(
