@@ -29,8 +29,9 @@ const Players = () => {
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000';
         ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
+        ctx.textAlign = 'center';
 
-        game?.players.forEach(({ position: { x, y } }) => {
+        game?.players.forEach(({ position: { x, y }, name }) => {
           ctx.fillStyle = '#3b82f6';
 
           ctx.beginPath();
@@ -38,8 +39,8 @@ const Players = () => {
           ctx.fill();
           ctx.stroke();
 
-          // ctx.fillStyle = '#fff';
-          // ctx.fillText(player.name, x - PLAYER_SIZE, y + PLAYER_SIZE + 20);
+          ctx.fillStyle = '#fff';
+          ctx.fillText(name, x, y + PLAYER_SIZE + 20);
 
           ctx.closePath();
         });

@@ -105,6 +105,8 @@ export class GameServer {
   }
 
   private joinGame({ socketId, name }: PlayerJoin, gameId: string) {
+    if (this.getGame(gameId)?.players.get(socketId)) return;
+
     this.addPlayerToGame({ socketId, name }, gameId);
 
     this.sockets.get(socketId)?.join(gameId);
