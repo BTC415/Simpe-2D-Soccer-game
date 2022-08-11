@@ -6,13 +6,22 @@ import {
   REAL_BOARD_SIZE,
 } from '@/common/constants/settings';
 
+import { useCamera } from '../hooks/useCamera';
+
 const Background = () => {
+  const { camX, camY } = useCamera();
+
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (ref.current) {
       const ctx = ref.current.getContext('2d');
       if (ctx) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, REAL_BOARD_SIZE.width, REAL_BOARD_SIZE.height);
+
+        ctx.translate(camX, camY);
+
         ctx.fillStyle = '#5A9D61';
         ctx.fillRect(0, 0, REAL_BOARD_SIZE.width, REAL_BOARD_SIZE.height);
 
@@ -65,7 +74,7 @@ const Background = () => {
         );
       }
     }
-  }, []);
+  }, [camX, camY]);
 
   return (
     <canvas

@@ -1,6 +1,6 @@
 export const BOARD_SIZE = {
-  width: 1100,
-  height: 600,
+  width: 1900,
+  height: 1000,
   rounded: 50,
 };
 
