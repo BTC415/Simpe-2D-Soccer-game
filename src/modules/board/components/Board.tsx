@@ -3,7 +3,7 @@ import Players from './Players';
 
 const Board = () => {
   return (
-    <div className="mt-16 flex w-full justify-center">
+    <div className="mt-5 flex w-full justify-center">
       <Players />
       <Background />
     </div>

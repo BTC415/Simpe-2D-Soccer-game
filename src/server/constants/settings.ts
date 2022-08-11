@@ -1,6 +1,11 @@
-import { BOARD_SIZE, PLAYER_SIZE } from '../../common/constants/settings';
+import {
+  BOARD_SIZE,
+  PLAYER_SIZE,
+  MOVE_AREA_SIZE,
+  REAL_BOARD_SIZE,
+} from '../../common/constants/settings';
 
-export { BOARD_SIZE, PLAYER_SIZE };
+export { BOARD_SIZE, PLAYER_SIZE, MOVE_AREA_SIZE, REAL_BOARD_SIZE };
 
 export const MOVE = {
   MAX_SPEED: 2.5,

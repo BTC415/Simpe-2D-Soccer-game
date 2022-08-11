@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-import { BOARD_SIZE, PLAYER_SIZE } from '@/common/constants/settings';
+import {
+  BOARD_SIZE,
+  PLAYER_SIZE,
+  REAL_BOARD_SIZE,
+} from '@/common/constants/settings';
 import { useAnimationFrame } from '@/common/hooks/useAnimationFrame';
 import { socket } from '@/common/libs/socket';
 import type { GameClient } from '@/common/types/game.type';
@@ -47,7 +51,7 @@ const Players = () => {
     if (ref.current) {
       const ctx = ref.current.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, BOARD_SIZE.width, BOARD_SIZE.height);
+        ctx.clearRect(0, 0, REAL_BOARD_SIZE.width, REAL_BOARD_SIZE.height);
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000';
 
@@ -89,8 +93,8 @@ const Players = () => {
   return (
     <canvas
       ref={ref}
-      width={BOARD_SIZE.width}
-      height={BOARD_SIZE.height}
+      width={REAL_BOARD_SIZE.width}
+      height={REAL_BOARD_SIZE.height}
       className="absolute z-10"
     />
   );
