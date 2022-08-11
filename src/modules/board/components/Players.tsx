@@ -1,27 +1,45 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { BOARD_SIZE, PLAYER_SIZE } from '@/common/constants/settings';
+import { useAnimationFrame } from '@/common/hooks/useAnimationFrame';
 import { socket } from '@/common/libs/socket';
 import type { GameClient } from '@/common/types/game.type';
+import { TICKRATE } from '@/server/constants/settings';
 
 import { useKeysDirection } from '../hooks/useKeysDirection';
 
 const Players = () => {
   const ref = useRef<HTMLCanvasElement>(null);
 
-  const [game, setGame] = useState<GameClient>();
+  const game = useRef<GameClient>();
+  const prevGame = useRef<GameClient>();
 
   useKeysDirection();
 
-  useEffect(() => {
-    socket.on('update', (newGame) => setGame(newGame));
+  useAnimationFrame((fps) => {
+    if (!prevGame.current || !game.current) return;
 
-    return () => {
-      socket.off('update');
-    };
-  }, []);
+    // SMOOTHER MOVEMENT ON HIGH FPS
+    const ratio = fps / TICKRATE;
+    prevGame.current.players = prevGame.current.players.map((player, index) => {
+      const { position } = player;
+      const newPosition = game.current!.players[index].position;
 
-  useEffect(() => {
+      const difX = newPosition.x - position.x;
+      const difY = newPosition.y - position.y;
+
+      const newX = position.x + difX / ratio;
+      const newY = position.y + difY / ratio;
+
+      return {
+        ...player,
+        position: {
+          x: newX,
+          y: newY,
+        },
+      };
+    });
+
     if (ref.current) {
       const ctx = ref.current.getContext('2d');
       if (ctx) {
@@ -29,7 +47,7 @@ const Players = () => {
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000';
 
-        game?.players.forEach(({ position: { x, y }, team }) => {
+        prevGame.current.players.forEach(({ position: { x, y }, team }) => {
           ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
 
           ctx.beginPath();
@@ -42,12 +60,27 @@ const Players = () => {
         ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
-        game?.players.forEach(({ position: { x, y }, name }) => {
+
+        ctx.fillText(`${fps}fps`, BOARD_SIZE.width - 40, 25);
+
+        prevGame.current.players.forEach(({ position: { x, y }, name }) => {
           ctx.fillText(name, x, y + PLAYER_SIZE + 20);
         });
       }
     }
-  }, [game?.players]);
+  });
+
+  useEffect(() => {
+    socket.on('update', (newGame) => {
+      if (game.current) prevGame.current = game.current;
+
+      game.current = newGame;
+    });
+
+    return () => {
+      socket.off('update');
+    };
+  }, []);
 
   return (
     <canvas
