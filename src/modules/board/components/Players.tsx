@@ -1,10 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import {
-  BOARD_SIZE,
-  PLAYER_SIZE,
-  REAL_BOARD_SIZE,
-} from '@/common/constants/settings';
+import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
 import { useAnimationFrame } from '@/common/hooks/useAnimationFrame';
 import { socket } from '@/common/libs/socket';
 import type { GameClient } from '@/common/types/game.type';
