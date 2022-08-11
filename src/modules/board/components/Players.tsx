@@ -51,7 +51,12 @@ const Players = () => {
     if (ref.current) {
       const ctx = ref.current.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, REAL_BOARD_SIZE.width, REAL_BOARD_SIZE.height);
+        ctx.clearRect(
+          0,
+          0,
+          REAL_BOARD_SIZE.width + PLAYER_SIZE * 2,
+          REAL_BOARD_SIZE.height + PLAYER_SIZE
+        );
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000';
 
@@ -59,7 +64,7 @@ const Players = () => {
           ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
 
           ctx.beginPath();
-          ctx.arc(x, y, PLAYER_SIZE, 0, Math.PI * 2);
+          ctx.arc(x + PLAYER_SIZE, y, PLAYER_SIZE, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
           ctx.closePath();
@@ -69,10 +74,10 @@ const Players = () => {
         ctx.textAlign = 'center';
         ctx.fillStyle = '#fff';
 
-        ctx.fillText(`${fps}fps`, BOARD_SIZE.width - 40, 25);
+        ctx.fillText(`${fps}fps`, REAL_BOARD_SIZE.width - 10, 25);
 
         prevGame.current.players.forEach(({ position: { x, y }, name }) => {
-          ctx.fillText(name, x, y + PLAYER_SIZE + 20);
+          ctx.fillText(name, x + PLAYER_SIZE, y + PLAYER_SIZE + 20);
         });
       }
     }
@@ -93,8 +98,8 @@ const Players = () => {
   return (
     <canvas
       ref={ref}
-      width={REAL_BOARD_SIZE.width}
-      height={REAL_BOARD_SIZE.height}
+      width={REAL_BOARD_SIZE.width + PLAYER_SIZE * 2}
+      height={REAL_BOARD_SIZE.height + PLAYER_SIZE}
       className="absolute z-10"
     />
   );
