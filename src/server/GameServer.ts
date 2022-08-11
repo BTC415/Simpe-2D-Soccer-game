@@ -8,7 +8,7 @@ import type {
   ServerToClient,
 } from '@/common/types/socket.type';
 
-import { REAL_BOARD_SIZE, TICKRATE } from './constants/settings';
+import { BOARD_SIZE, REAL_BOARD_SIZE, TICKRATE } from './constants/settings';
 import { handlePlayersMovement } from './helpers/handlePlayersMovement';
 
 type PlayerJoin = {
@@ -127,7 +127,7 @@ export class GameServer {
       id: socketId,
       name: !name ? `Player ${game.players.size + 1}` : name,
       position: {
-        x: game.players.size % 2 === 1 ? REAL_BOARD_SIZE.width - 200 : 200,
+        x: game.players.size % 2 === 1 ? BOARD_SIZE.width - 200 : 200,
         y: REAL_BOARD_SIZE.height / 2,
       },
       team: game.players.size % 2 === 1 ? 'red' : 'blue',
