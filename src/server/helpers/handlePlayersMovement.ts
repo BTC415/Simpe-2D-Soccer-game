@@ -64,10 +64,7 @@ export const handlePlayersMovement = (
 
         players.set(playerCollisionId, {
           ...playerCollision,
-          position: makePosition(
-            playerCollision.position.x - unitX,
-            playerCollision.position.y - unitY
-          ),
+          velocityVector: { x: -unitX * 1.2, y: -unitY * 1.2 },
         });
       }
     });
