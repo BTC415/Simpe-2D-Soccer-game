@@ -23,7 +23,8 @@ const Players = () => {
     const ratio = fps / TICKRATE;
     prevGame.current.players = prevGame.current.players.map((player, index) => {
       const { position } = player;
-      const newPosition = game.current!.players[index].position;
+      const newPosition = game.current?.players[index].position;
+      if (!newPosition) return player;
 
       const difX = newPosition.x - position.x;
       const difY = newPosition.y - position.y;
