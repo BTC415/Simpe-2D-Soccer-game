@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { socket } from '@/common/libs/socket';
 import Board from '@/modules/board';
 import GameInfo from '@/modules/gameInfo';
+import { Toggler } from '@/modules/menu';
 
 const GamePage: NextPage = () => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const GamePage: NextPage = () => {
     <div>
       <GameInfo />
       <Board />
+      <Toggler />
     </div>
   );
 };

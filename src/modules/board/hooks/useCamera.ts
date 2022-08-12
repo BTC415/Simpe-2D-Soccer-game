@@ -25,8 +25,8 @@ export const useCamera = () => {
     if (window.innerHeight < REAL_BOARD_SIZE.height) {
       camY = -clamp(
         y - window.innerHeight / 2,
-        -PLAYER_SIZE * 2 - 12,
-        REAL_BOARD_SIZE.height - window.innerHeight
+        -PLAYER_SIZE * 2,
+        REAL_BOARD_SIZE.height - window.innerHeight + PLAYER_SIZE * 2 + 28
       );
     }
   }
