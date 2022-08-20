@@ -3,6 +3,7 @@ import { MotionConfig } from 'framer-motion';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 
+import AdminProvider from '@/common/context/adminContext';
 import ModalManager from '@/modules/modal';
 
 const App = ({ Component, pageProps }: AppProps) => {
@@ -13,9 +14,11 @@ const App = ({ Component, pageProps }: AppProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <MotionConfig transition={{ ease: [0.6, 0.01, -0.05, 0.9] }}>
-        <ModalManager>
-          <Component {...pageProps} />
-        </ModalManager>
+        <AdminProvider>
+          <ModalManager>
+            <Component {...pageProps} />
+          </ModalManager>
+        </AdminProvider>
       </MotionConfig>
     </>
   );

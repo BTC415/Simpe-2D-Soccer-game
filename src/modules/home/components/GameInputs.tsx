@@ -2,20 +2,30 @@ import { FormEvent, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useAdmin } from '@/common/hooks/useAdmin';
 import { socket } from '@/common/libs/socket';
 
 const GameInputs = ({ name }: { name: string }) => {
+  const { setAdmin } = useAdmin();
+
   const [gameId, setGameId] = useState('');
 
   const router = useRouter();
 
   useEffect(() => {
-    socket.on('game_joined', (serverGameId) => router.push(serverGameId));
+    socket.on('game_joined', (serverGameId, id) => {
+      setAdmin({
+        id,
+        name,
+      });
+
+      router.push(serverGameId);
+    });
 
     return () => {
       socket.off('game_joined');
     };
-  }, [router]);
+  }, [name, router, setAdmin]);
 
   const handleJoinGame = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

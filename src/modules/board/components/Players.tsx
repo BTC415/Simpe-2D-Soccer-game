@@ -1,33 +1,75 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
+import { useAdmin } from '@/common/hooks/useAdmin';
 import { socket } from '@/common/libs/socket';
-import type { GameClient } from '@/common/types/game.type';
+import type { Data, DirectionData, UpdateData } from '@/common/types/peer.type';
+import type { Player } from '@/common/types/player.type';
 
+import { useAdminGame } from '../hooks/useAdminGame';
 import { useCamera } from '../hooks/useCamera';
 import { useKeysDirection } from '../hooks/useKeysDirection';
+import { usePeers } from '../hooks/usePeers';
 
 const Players = () => {
   const { setPosition, camX, camY } = useCamera();
+  const { admin } = useAdmin();
 
   const ref = useRef<HTMLCanvasElement>(null);
 
-  const [game, setGame] = useState<GameClient>();
+  const [players, setPlayers] = useState<Map<string, Player>>(new Map());
 
-  useKeysDirection();
+  const direction = useKeysDirection();
+
+  const { peers, names } = usePeers();
+  const adminPlayers = useAdminGame({ peers, names }, direction);
 
   useEffect(() => {
-    socket.on('update', (newGame) => {
-      setGame(newGame);
-      newGame.players.forEach(
-        ({ position, id }) => id === socket.id && setPosition(position)
-      );
-    });
+    if (admin.id !== socket.id) {
+      const adminPeer = peers.get(admin.id);
 
-    return () => {
-      socket.off('update');
-    };
-  }, [setPosition]);
+      if (adminPeer) {
+        adminPeer.on('data', (data: string) => {
+          const parsedData = JSON.parse(data) as Data;
+
+          if (parsedData.type === 'update')
+            setPlayers(new Map((parsedData as UpdateData).players));
+        });
+      }
+
+      return () => {
+        if (adminPeer) {
+          adminPeer.removeAllListeners('data');
+        }
+      };
+    }
+
+    return () => {};
+  }, [admin.id, peers]);
+
+  useEffect(() => {
+    if (admin.id !== socket.id) {
+      const adminPeer = peers.get(admin.id);
+
+      if (adminPeer && adminPeer.connected) {
+        adminPeer.send(
+          JSON.stringify({
+            type: 'direction',
+            direction,
+          } as DirectionData)
+        );
+      }
+    }
+  }, [admin.id, direction, peers]);
+
+  const finalPlayers = admin.id === socket.id ? adminPlayers : players;
+
+  useEffect(() => {
+    const myPosition = finalPlayers.get(socket.id)?.position;
+    if (myPosition) setPosition(myPosition);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finalPlayers]);
 
   if (ref.current) {
     const ctx = ref.current.getContext('2d');
@@ -45,7 +87,7 @@ const Players = () => {
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#000';
 
-      game?.players.forEach(({ position: { x, y }, team }) => {
+      finalPlayers.forEach(({ position: { x, y }, team }) => {
         ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
 
         ctx.beginPath();
@@ -58,7 +100,7 @@ const Players = () => {
       ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
       ctx.textAlign = 'center';
       ctx.fillStyle = '#fff';
-      game?.players.forEach(({ position: { x, y }, name }) => {
+      finalPlayers.forEach(({ position: { x, y }, name }) => {
         ctx.fillText(name, x, y + PLAYER_SIZE + 20);
       });
     }

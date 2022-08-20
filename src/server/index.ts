@@ -10,7 +10,7 @@ import type {
   ServerToClient,
 } from '@/common/types/socket.type';
 
-import { GameServer } from './GameServer';
+import { SocketServer } from './SocketServer';
 
 const port = parseInt(process.env.PORT || '3000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -22,7 +22,7 @@ nextApp.prepare().then(async () => {
   const server = createServer(app);
 
   // eslint-disable-next-line no-new
-  new GameServer(new Server<ClientToServer, ServerToClient>(server));
+  new SocketServer(new Server<ClientToServer, ServerToClient>(server));
 
   app.all('*', (req: any, res: any) => nextHandler(req, res));
 

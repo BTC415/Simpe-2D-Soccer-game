@@ -12,3 +12,11 @@ export const REAL_BOARD_SIZE = {
   width: BOARD_SIZE.width + MOVE_AREA_SIZE * 2,
   height: BOARD_SIZE.height + MOVE_AREA_SIZE * 2,
 };
+
+export const TICKRATE = 128;
+
+export const MOVE = {
+  MAX_SPEED: 1.25,
+  ACCELERATION: 0.035,
+  DECELERATION: 0.012,
+};
