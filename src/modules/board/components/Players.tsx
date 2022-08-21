@@ -114,6 +114,7 @@ const Players = () => {
       ctx.textAlign = 'center';
 
       finalPlayers.forEach(({ name, team }, id) => {
+        if (!finalPlayersPositions[id]) return;
         const [x, y] = finalPlayersPositions[id];
 
         ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
