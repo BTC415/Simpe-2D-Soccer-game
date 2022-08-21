@@ -22,7 +22,7 @@ const Players = () => {
   const direction = useKeysDirection();
 
   const { peers, names } = usePeers();
-  const adminPlayers = useAdminGame({ peers, names }, direction);
+  const adminPlayers = useAdminGame({ peers, names }, direction, players);
 
   useEffect(() => {
     if (admin.id !== socket.id) {

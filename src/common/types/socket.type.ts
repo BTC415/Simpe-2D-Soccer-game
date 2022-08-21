@@ -15,6 +15,7 @@ export interface ServerToClient {
   game_not_found: () => void;
   player_joined: (player: SimplePlayer) => void;
   player_left: (playerId: string) => void;
+  admin_change: (newAdminId: string) => void;
 
   player_signal: (signal: SignalData, fromPlayerId: string) => void;
 }

@@ -18,9 +18,10 @@ export const useAdminGame = (
     peers: Map<string, Peer.Instance>;
     names: Map<string, string>;
   },
-  direction: Direction
+  direction: Direction,
+  playersFromAdmin?: Map<string, Player>
 ) => {
-  const { admin } = useAdmin();
+  const { admin, prevAdminId } = useAdmin();
 
   const players = useRef<Map<string, Player>>(new Map());
   const [playersState, setPlayersState] = useState<Map<string, Player>>(
@@ -53,6 +54,18 @@ export const useAdminGame = (
   }, [admin.id, players, peers]);
 
   useEffect(() => {
+    if (
+      playersFromAdmin &&
+      admin.id === socket.id &&
+      prevAdminId !== admin.id
+    ) {
+      playersFromAdmin.delete(prevAdminId);
+      players.current = playersFromAdmin;
+      setPlayersState(players.current);
+    }
+  }, [admin.id, playersFromAdmin, prevAdminId]);
+
+  useEffect(() => {
     players.current.set(admin.id, {
       ...players.current.get(admin.id)!,
       direction,
@@ -82,7 +95,7 @@ export const useAdminGame = (
       peers.forEach((peer, id) => {
         peer.on('connect', () => {
           players.current.set(id, {
-            name: names.get(id) || `Player ${peers.size + 1}`,
+            name: names.get(id) || `Player ${players.current.size + 1}`,
             position: {
               x: REAL_BOARD_SIZE.width - 200,
               y: REAL_BOARD_SIZE.height / 2,

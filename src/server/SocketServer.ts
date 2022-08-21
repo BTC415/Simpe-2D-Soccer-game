@@ -97,7 +97,23 @@ export class SocketServer {
     const gameAdmin = this.getGameAdmin(gameId);
     if (!gameAdmin) return;
 
-    this.io.to(gameAdmin).emit('player_left', socketId);
+    this.getSocketById(socketId)?.leave(gameId);
+
+    if (gameAdmin === socketId) {
+      const room = this.io.sockets.adapter.rooms.get(gameId);
+      if (room) {
+        const newAdminId = [...room][0];
+
+        if (newAdminId) {
+          this.gamesAdmins.set(gameId, newAdminId);
+          this.io.to(gameId).emit('admin_change', newAdminId);
+        } else {
+          this.gamesAdmins.delete(gameId);
+        }
+      } else {
+        this.gamesAdmins.delete(gameId);
+      }
+    } else this.io.to(gameAdmin).emit('player_left', socketId);
   }
 
   private signalPlayer(
@@ -108,29 +124,4 @@ export class SocketServer {
 
     this.io.to(toPlayerId).emit('player_signal', signal, fromPlayerId);
   }
-
-  // private deleteGame(gameId: string) {
-  //   this.games = this.games.filter((game) => game.id !== gameId);
-
-  //   const intervalId = this.gamesIntervals.get(gameId);
-  //   if (intervalId) {
-  //     clearInterval(intervalId);
-  //     this.gamesIntervals.delete(gameId);
-  //   }
-  // }
-
-  // private setupGame(gameId: string) {
-  //   const game = this.getGame(gameId);
-  //   if (!game) return;
-
-  //   const interval = setInterval(() => {
-  //     game.players = handlePlayersMovement(game.players);
-
-  //     this.io
-  //       .to(game.id)
-  //       .emit('update', { id: gameId, players: [...game.players.values()] });
-  //   }, 1000 / TICKRATE);
-
-  //   this.gamesIntervals.set(gameId, interval);
-  // }
 }
