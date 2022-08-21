@@ -12,7 +12,7 @@ import { useKeysDirection } from '../hooks/useKeysDirection';
 import { usePeers } from '../hooks/usePeers';
 
 const Players = () => {
-  const { setPosition, camX, camY } = useCamera();
+  const { setPosition, camX, camY, position } = useCamera();
   const { admin } = useAdmin();
 
   const ref = useRef<HTMLCanvasElement>(null);
@@ -66,7 +66,11 @@ const Players = () => {
 
   useEffect(() => {
     const myPosition = finalPlayers.get(socket.id)?.position;
-    if (myPosition) setPosition(myPosition);
+    if (
+      myPosition &&
+      (myPosition.x !== position.x || myPosition.y !== position.y)
+    )
+      setPosition(myPosition);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalPlayers]);

@@ -31,5 +31,5 @@ export const useCamera = () => {
     }
   }
 
-  return { camX, camY, setPosition, x, y };
+  return { camX, camY, setPosition, position: { x, y } };
 };
