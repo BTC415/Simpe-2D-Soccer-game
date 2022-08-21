@@ -19,7 +19,7 @@ const GamePage: NextPage = () => {
     if (gameId) socket.emit('join_game', '', gameId.toString());
 
     socket.on('game_joined', (_, id) => {
-      setAdmin({ id, name: '' });
+      setAdmin((prev) => ({ ...prev, id }));
     });
     socket.on('game_not_found', () => router.push('/'));
 

@@ -1,10 +1,14 @@
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { BsFillPauseFill, BsFillStopFill } from 'react-icons/bs';
 import { HiChevronLeft } from 'react-icons/hi';
 
+import { useModal } from '@/modules/modal';
+
 import TeamSelect from './TeamSelect';
 
 const Menu = () => {
+  const { closeModal } = useModal();
   const { gameId } = useRouter().query;
 
   return (
@@ -26,10 +30,15 @@ const Menu = () => {
           <BsFillPauseFill />
           Pause game
         </button>
-        <button className="btn w-36 bg-red-500 from-red-500">
-          <HiChevronLeft />
-          Leave game
-        </button>
+        <Link href="/">
+          <button
+            className="btn w-36 bg-red-500 from-red-500"
+            onClick={closeModal}
+          >
+            <HiChevronLeft />
+            Leave game
+          </button>
+        </Link>
       </div>
     </div>
   );

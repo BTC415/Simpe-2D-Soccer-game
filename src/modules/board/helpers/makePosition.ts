@@ -10,5 +10,5 @@ export const makePosition = (x: number, y: number) => {
     PLAYER_SIZE
   );
 
-  return { x: newX, y: newY };
+  return { x: Math.round(newX * 10) / 10, y: Math.round(newY * 10) / 10 };
 };

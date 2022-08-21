@@ -15,7 +15,6 @@ export const usePeers = () => {
     socket.on('player_joined', ({ name, id }) => {
       const peer = new Peer({
         initiator: false,
-        objectMode: true,
       });
 
       if (!peers.has(id)) setPeers((prev) => new Map(prev).set(id, peer));
@@ -63,7 +62,6 @@ export const usePeers = () => {
     if (admin.id && admin.id !== socket.id && !peers.has(admin.id)) {
       const peer = new Peer({
         initiator: true,
-        objectMode: true,
       });
 
       setPeers((prev) => new Map(prev).set(admin.id, peer));

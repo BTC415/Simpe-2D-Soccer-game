@@ -4,11 +4,27 @@ import Peer from 'simple-peer';
 
 import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
 import { useAdmin } from '@/common/hooks/useAdmin';
+import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
-import type { Data, DirectionData, UpdateData } from '@/common/types/peer.type';
+import {
+  Data,
+  DataType,
+  DirectionData,
+  PositionData,
+} from '@/common/types/peer.type';
 import { Direction, Player } from '@/common/types/player.type';
 
 import { handlePlayersMovement } from '../helpers/handlePlayersMovement';
+
+const makeEasyPositions = (players: Map<string, Player>) => {
+  const easyPositions: { [key: string]: [number, number] } = {};
+
+  players.forEach(({ position }, id) => {
+    easyPositions[id] = [position.x, position.y];
+  });
+
+  return easyPositions;
+};
 
 export const useAdminGame = (
   {
@@ -20,7 +36,12 @@ export const useAdminGame = (
   },
   direction: Direction,
   playersFromAdmin?: Map<string, Player>
-) => {
+): [
+  {
+    [key: string]: [number, number];
+  },
+  Map<string, Player>
+] => {
   const { admin, prevAdminId } = useAdmin();
 
   const players = useRef<Map<string, Player>>(new Map());
@@ -29,10 +50,11 @@ export const useAdminGame = (
   );
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let gameplay: NodeJS.Timeout;
+    let updateGame: NodeJS.Timeout;
 
     if (socket.id === admin.id) {
-      interval = setInterval(() => {
+      gameplay = setInterval(() => {
         players.current = handlePlayersMovement(players.current);
         setPlayersState(players.current);
 
@@ -40,22 +62,35 @@ export const useAdminGame = (
           if (peer.connected)
             peer.send(
               JSON.stringify({
-                type: 'update',
-                players: [...players.current],
-              } as UpdateData)
+                type: DataType.POSITIONS,
+                positions: makeEasyPositions(players.current),
+              } as PositionData)
             );
         });
       }, 1000 / TICKRATE);
+
+      updateGame = setInterval(() => {
+        peers.forEach((peer) => {
+          if (peer.connected)
+            peer.send(
+              JSON.stringify({
+                type: DataType.GAME,
+                players: [...players.current],
+              } as Data)
+            );
+        });
+      }, 1000);
     }
 
     return () => {
-      clearInterval(interval);
+      clearInterval(gameplay);
+      clearInterval(updateGame);
     };
   }, [admin.id, players, peers]);
 
   useEffect(() => {
     if (
-      playersFromAdmin &&
+      playersFromAdmin?.size &&
       admin.id === socket.id &&
       prevAdminId !== admin.id
     ) {
@@ -109,17 +144,17 @@ export const useAdminGame = (
           });
         });
 
-        peer.on('data', (data: string) => {
-          const parsedData = JSON.parse(data) as Data;
+        peer.on('data', (data: Uint8Array) => {
+          const parsedData = JSON.parse(decoder.decode(data)) as Data;
 
-          if (parsedData.type === 'direction') {
+          if (parsedData.type === DataType.DIRECTION) {
             const newDirection = (parsedData as DirectionData).direction;
 
             players.current.set(id, {
               ...players.current.get(id)!,
               direction: newDirection,
             });
-          } else if (parsedData.type === 'shoot') {
+          } else if (parsedData.type === DataType.SHOOT) {
             // TODO: handle shoot
           }
         });
@@ -143,5 +178,5 @@ export const useAdminGame = (
     };
   }, []);
 
-  return playersState;
+  return [makeEasyPositions(playersState), playersState];
 };

@@ -2,8 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
 import { useAdmin } from '@/common/hooks/useAdmin';
+import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
-import type { Data, DirectionData, UpdateData } from '@/common/types/peer.type';
+import {
+  Data,
+  DataType,
+  DirectionData,
+  GameData,
+  PositionData,
+} from '@/common/types/peer.type';
 import type { Player } from '@/common/types/player.type';
 
 import { useAdminGame } from '../hooks/useAdminGame';
@@ -18,22 +25,32 @@ const Players = () => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   const [players, setPlayers] = useState<Map<string, Player>>(new Map());
+  const [playersPositions, setPlayersPositions] = useState<{
+    [key: string]: [number, number];
+  }>({});
 
   const direction = useKeysDirection();
 
   const { peers, names } = usePeers();
-  const adminPlayers = useAdminGame({ peers, names }, direction, players);
+  const [adminPlayersPositions, adminPlayers] = useAdminGame(
+    { peers, names },
+    direction,
+    players
+  );
 
   useEffect(() => {
     if (admin.id !== socket.id) {
       const adminPeer = peers.get(admin.id);
 
       if (adminPeer) {
-        adminPeer.on('data', (data: string) => {
-          const parsedData = JSON.parse(data) as Data;
+        adminPeer.on('data', (data: Uint8Array) => {
+          const parsedData = JSON.parse(decoder.decode(data)) as Data;
 
-          if (parsedData.type === 'update')
-            setPlayers(new Map((parsedData as UpdateData).players));
+          if (parsedData.type === DataType.POSITIONS)
+            setPlayersPositions((parsedData as PositionData).positions);
+
+          if (parsedData.type === DataType.GAME)
+            setPlayers(new Map((parsedData as GameData).players));
         });
       }
 
@@ -54,7 +71,7 @@ const Players = () => {
       if (adminPeer && adminPeer.connected) {
         adminPeer.send(
           JSON.stringify({
-            type: 'direction',
+            type: DataType.DIRECTION,
             direction,
           } as DirectionData)
         );
@@ -62,18 +79,21 @@ const Players = () => {
     }
   }, [admin.id, direction, peers]);
 
+  const finalPlayersPositions =
+    admin.id === socket.id ? adminPlayersPositions : playersPositions;
+
   const finalPlayers = admin.id === socket.id ? adminPlayers : players;
 
   useEffect(() => {
-    const myPosition = finalPlayers.get(socket.id)?.position;
+    const myPosition = finalPlayersPositions[socket.id];
     if (
       myPosition &&
-      (myPosition.x !== position.x || myPosition.y !== position.y)
+      (myPosition[0] !== position.x || myPosition[1] !== position.y)
     )
-      setPosition(myPosition);
+      setPosition({ x: myPosition[0], y: myPosition[1] });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finalPlayers]);
+  }, [finalPlayersPositions]);
 
   if (ref.current) {
     const ctx = ref.current.getContext('2d');
@@ -90,8 +110,12 @@ const Players = () => {
 
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#000';
+      ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
+      ctx.textAlign = 'center';
 
-      finalPlayers.forEach(({ position: { x, y }, team }) => {
+      finalPlayers.forEach(({ name, team }, id) => {
+        const [x, y] = finalPlayersPositions[id];
+
         ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
 
         ctx.beginPath();
@@ -99,12 +123,8 @@ const Players = () => {
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
-      });
 
-      ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#fff';
-      finalPlayers.forEach(({ position: { x, y }, name }) => {
+        ctx.fillStyle = '#fff';
         ctx.fillText(name, x, y + PLAYER_SIZE + 20);
       });
     }
