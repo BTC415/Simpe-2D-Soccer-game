@@ -1,4 +1,5 @@
-import { Direction, Player } from './player.type';
+import { Game } from './game.type';
+import { Direction } from './player.type';
 
 export enum DataType {
   POSITIONS = 0,
@@ -20,7 +21,7 @@ export type PositionData = {
 
 export type GameData = {
   type: DataType.GAME;
-  players: Map<string, Player>;
+  game: Game;
 };
 
 export type DirectionData = {

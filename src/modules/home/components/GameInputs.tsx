@@ -2,11 +2,11 @@ import { FormEvent, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useAdmin } from '@/common/hooks/useAdmin';
+import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
 
 const GameInputs = ({ name }: { name: string }) => {
-  const { setAdmin } = useAdmin();
+  const { setAdmin } = useGame();
 
   const [gameId, setGameId] = useState('');
 

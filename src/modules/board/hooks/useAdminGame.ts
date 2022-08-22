@@ -3,16 +3,18 @@ import { useEffect, useRef, useState } from 'react';
 import Peer from 'simple-peer';
 
 import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
-import { useAdmin } from '@/common/hooks/useAdmin';
+import { useGame } from '@/common/hooks/useGame';
 import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
+import type { Game } from '@/common/types/game.type';
 import {
   Data,
   DataType,
   DirectionData,
+  GameData,
   PositionData,
 } from '@/common/types/peer.type';
-import { Direction, Player } from '@/common/types/player.type';
+import { Direction, Player, PlayerTeam } from '@/common/types/player.type';
 
 import { handlePlayersMovement } from '../helpers/handlePlayersMovement';
 
@@ -35,14 +37,15 @@ export const useAdminGame = (
     names: Map<string, string>;
   },
   direction: Direction,
-  playersFromAdmin?: Map<string, Player>
+  gameFromAdmin?: Game
 ): [
   {
     [key: string]: [number, number];
   },
   Map<string, Player>
 ] => {
-  const { admin, prevAdminId } = useAdmin();
+  const { game, prevGame, setGame } = useGame();
+  const { admin } = game;
 
   const players = useRef<Map<string, Player>>(new Map());
   const [playersState, setPlayersState] = useState<Map<string, Player>>(
@@ -70,13 +73,18 @@ export const useAdminGame = (
       }, 1000 / TICKRATE);
 
       updateGame = setInterval(() => {
+        const newGame = { ...game, players: players.current };
+        setGame(newGame);
         peers.forEach((peer) => {
           if (peer.connected)
             peer.send(
               JSON.stringify({
                 type: DataType.GAME,
-                players: [...players.current],
-              } as Data)
+                game: {
+                  ...newGame,
+                  players: [...players.current],
+                },
+              } as any as GameData)
             );
         });
       }, 1000);
@@ -86,19 +94,19 @@ export const useAdminGame = (
       clearInterval(gameplay);
       clearInterval(updateGame);
     };
-  }, [admin.id, players, peers]);
+  }, [admin.id, game, peers, setGame]);
 
   useEffect(() => {
     if (
-      playersFromAdmin?.size &&
+      gameFromAdmin?.players.size &&
       admin.id === socket.id &&
-      prevAdminId !== admin.id
+      prevGame.admin.id !== admin.id
     ) {
-      playersFromAdmin.delete(prevAdminId);
-      players.current = playersFromAdmin;
+      gameFromAdmin.players.delete(prevGame.admin.id);
+      players.current = gameFromAdmin.players;
       setPlayersState(players.current);
     }
-  }, [admin.id, playersFromAdmin, prevAdminId]);
+  }, [admin.id, gameFromAdmin?.players, prevGame.admin.id]);
 
   useEffect(() => {
     players.current.set(admin.id, {
@@ -119,7 +127,7 @@ export const useAdminGame = (
           x: 0,
           y: 0,
         },
-        team: 'blue',
+        team: PlayerTeam.BLUE,
         direction: { x: 0, y: 0 },
       });
     }
@@ -139,7 +147,7 @@ export const useAdminGame = (
               x: 0,
               y: 0,
             },
-            team: 'red',
+            team: PlayerTeam.RED,
             direction: { x: 0, y: 0 },
           });
         });

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
-import { useAdmin } from '@/common/hooks/useAdmin';
+import { useGame } from '@/common/hooks/useGame';
 import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
 import {
@@ -11,7 +11,7 @@ import {
   GameData,
   PositionData,
 } from '@/common/types/peer.type';
-import type { Player } from '@/common/types/player.type';
+import { PlayerTeam } from '@/common/types/player.type';
 
 import { useAdminGame } from '../hooks/useAdminGame';
 import { useCamera } from '../hooks/useCamera';
@@ -20,11 +20,11 @@ import { usePeers } from '../hooks/usePeers';
 
 const Players = () => {
   const { setPosition, camX, camY, position } = useCamera();
-  const { admin } = useAdmin();
+  const { game, setGame } = useGame();
+  const { admin } = game;
 
   const ref = useRef<HTMLCanvasElement>(null);
 
-  const [players, setPlayers] = useState<Map<string, Player>>(new Map());
   const [playersPositions, setPlayersPositions] = useState<{
     [key: string]: [number, number];
   }>({});
@@ -35,7 +35,7 @@ const Players = () => {
   const [adminPlayersPositions, adminPlayers] = useAdminGame(
     { peers, names },
     direction,
-    players
+    game
   );
 
   useEffect(() => {
@@ -49,8 +49,13 @@ const Players = () => {
           if (parsedData.type === DataType.POSITIONS)
             setPlayersPositions((parsedData as PositionData).positions);
 
-          if (parsedData.type === DataType.GAME)
-            setPlayers(new Map((parsedData as GameData).players));
+          if (parsedData.type === DataType.GAME) {
+            const gameFromAdmin = (parsedData as GameData).game;
+            setGame({
+              ...gameFromAdmin,
+              players: new Map(gameFromAdmin.players),
+            });
+          }
         });
       }
 
@@ -62,7 +67,7 @@ const Players = () => {
     }
 
     return () => {};
-  }, [admin.id, peers]);
+  }, [admin.id, peers, setGame]);
 
   useEffect(() => {
     if (admin.id !== socket.id) {
@@ -82,7 +87,7 @@ const Players = () => {
   const finalPlayersPositions =
     admin.id === socket.id ? adminPlayersPositions : playersPositions;
 
-  const finalPlayers = admin.id === socket.id ? adminPlayers : players;
+  const finalPlayers = admin.id === socket.id ? adminPlayers : game.players;
 
   useEffect(() => {
     const myPosition = finalPlayersPositions[socket.id];
@@ -114,10 +119,10 @@ const Players = () => {
       ctx.textAlign = 'center';
 
       finalPlayers.forEach(({ name, team }, id) => {
-        if (!finalPlayersPositions[id]) return;
+        if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;
         const [x, y] = finalPlayersPositions[id];
 
-        ctx.fillStyle = team === 'blue' ? '#3b82f6' : '#ef4444';
+        ctx.fillStyle = team === PlayerTeam.BLUE ? '#3b82f6' : '#ef4444';
 
         ctx.beginPath();
         ctx.arc(x, y, PLAYER_SIZE, 0, Math.PI * 2);

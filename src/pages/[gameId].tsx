@@ -3,14 +3,14 @@ import { useEffect } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 
-import { useAdmin } from '@/common/hooks/useAdmin';
+import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
 import Board from '@/modules/board';
 import GameInfo from '@/modules/gameInfo';
 import { Toggler } from '@/modules/menu';
 
 const GamePage: NextPage = () => {
-  const { setAdmin } = useAdmin();
+  const { setAdmin } = useGame();
 
   const router = useRouter();
 
@@ -19,7 +19,7 @@ const GamePage: NextPage = () => {
     if (gameId) socket.emit('join_game', '', gameId.toString());
 
     socket.on('game_joined', (_, id) => {
-      setAdmin((prev) => ({ ...prev, id }));
+      setAdmin({ id });
     });
     socket.on('game_not_found', () => router.push('/'));
 
@@ -27,7 +27,9 @@ const GamePage: NextPage = () => {
       socket.off('game_joined');
       socket.off('game_not_found');
     };
-  }, [router, setAdmin]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   return (
     <div>

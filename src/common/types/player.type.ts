@@ -5,9 +5,15 @@ export type SimplePlayer = {
   name: string;
 };
 
+export enum PlayerTeam {
+  BLUE,
+  RED,
+  SPECTATOR,
+}
+
 export interface Player {
   name: string;
-  team: 'red' | 'blue';
+  team: PlayerTeam;
   position: { x: number; y: number };
   direction: Direction;
   velocityVector: { x: number; y: number };

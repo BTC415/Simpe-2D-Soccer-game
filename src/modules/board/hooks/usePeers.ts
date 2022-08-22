@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react';
 
 import Peer from 'simple-peer';
 
-import { useAdmin } from '@/common/hooks/useAdmin';
+import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
 
 export const usePeers = () => {
-  const { admin, setAdmin } = useAdmin();
+  const {
+    game: { admin },
+    setAdmin,
+  } = useGame();
 
   const [peers, setPeers] = useState<Map<string, Peer.Instance>>(new Map());
   const [names, setNames] = useState<Map<string, string>>(new Map());
@@ -47,7 +50,7 @@ export const usePeers = () => {
 
         return newPeers;
       });
-      setAdmin((prev) => ({ ...prev, id: newAdminId }));
+      setAdmin({ id: newAdminId });
     });
 
     return () => {
