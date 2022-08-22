@@ -108,9 +108,14 @@ export const usePeers = () => {
   }, [peers]);
 
   useEffect(() => {
+    if (game.admin.id === socket.id) {
+      setStatus(StatusPeer.CONNECTED);
+      return;
+    }
+
     const me = game.players.has(socket.id);
 
-    if (me && socket.id !== game.admin.id) setStatus(StatusPeer.CONNECTED);
+    if (me) setStatus(StatusPeer.CONNECTED);
   }, [game, setStatus]);
 
   useEffect(() => {

@@ -26,7 +26,7 @@ const GameProvider = ({
   children: JSX.Element | JSX.Element[];
 }) => {
   const [game, setGame] = useState<Game>(DEFAULT_GAME);
-  const [status, setStatus] = useState<StatusPeer>(StatusPeer.CONNECTING);
+  const [status, setStatus] = useState<StatusPeer>(StatusPeer.CONNECTED);
 
   return (
     <gameContext.Provider
