@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { gameContext } from '../context/gameContext';
 
 export const useGame = () => {
-  const { game, setGame } = useContext(gameContext);
+  const { game, setGame, setStatus, status } = useContext(gameContext);
   const [prevGame, setPrevGame] = useState(game);
 
   useEffect(() => {
@@ -19,5 +19,5 @@ export const useGame = () => {
     }));
   };
 
-  return { game, prevGame, setGame, setAdmin };
+  return { game, prevGame, setGame, setAdmin, status, setStatus };
 };

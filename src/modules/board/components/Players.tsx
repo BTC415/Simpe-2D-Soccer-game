@@ -118,7 +118,7 @@ const Players = () => {
       ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
       ctx.textAlign = 'center';
 
-      finalPlayers.forEach(({ name, team }, id) => {
+      finalPlayers.forEach(({ team }, id) => {
         if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;
         const [x, y] = finalPlayersPositions[id];
 
@@ -129,8 +129,13 @@ const Players = () => {
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
+      });
 
-        ctx.fillStyle = '#fff';
+      ctx.fillStyle = '#fff';
+      finalPlayers.forEach(({ name, team }, id) => {
+        if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;
+        const [x, y] = finalPlayersPositions[id];
+
         ctx.fillText(name, x, y + PLAYER_SIZE + 20);
       });
     }

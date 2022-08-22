@@ -8,7 +8,10 @@ import Players from './Players';
 
 const Board = () => {
   const [smallScreen, setSmallScreen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({
+    x: REAL_BOARD_SIZE.width / 2,
+    y: REAL_BOARD_SIZE.height / 2,
+  });
 
   const handleSetPosition = ({ x, y }: { x: number; y: number }) => {
     setPosition({ x, y });

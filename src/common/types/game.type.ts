@@ -10,3 +10,9 @@ export type Game = {
   secondsLeft: number;
   players: Map<string, Player>;
 };
+
+export enum StatusPeer {
+  CONNECTING,
+  ERROR,
+  CONNECTED,
+}

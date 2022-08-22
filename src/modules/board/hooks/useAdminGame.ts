@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useRouter } from 'next/router';
 import Peer from 'simple-peer';
 
 import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
@@ -52,6 +53,8 @@ export const useAdminGame = (
     new Map()
   );
 
+  const { gameId } = useRouter().query;
+
   useEffect(() => {
     let gameplay: NodeJS.Timeout;
     let updateGame: NodeJS.Timeout;
@@ -73,7 +76,11 @@ export const useAdminGame = (
       }, 1000 / TICKRATE);
 
       updateGame = setInterval(() => {
-        const newGame = { ...game, players: players.current };
+        const newGame: Game = {
+          ...game,
+          players: players.current,
+          id: gameId?.toString() || '',
+        };
         setGame(newGame);
         peers.forEach((peer) => {
           if (peer.connected)
@@ -94,7 +101,7 @@ export const useAdminGame = (
       clearInterval(gameplay);
       clearInterval(updateGame);
     };
-  }, [admin.id, game, peers, setGame]);
+  }, [admin.id, game, gameId, peers, setGame]);
 
   useEffect(() => {
     if (

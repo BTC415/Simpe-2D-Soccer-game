@@ -17,6 +17,7 @@ const ModalManager = ({
   children: JSX.Element | JSX.Element[];
 }) => {
   const [modal, setModal] = useState<JSX.Element | JSX.Element[] | null>(null);
+  const [userClose, setUserClose] = useState(true);
 
   const [portalNode, setPortalNode] = useState<HTMLElement>();
 
@@ -34,8 +35,12 @@ const ModalManager = ({
     }
   }, [modal, portalNode]);
 
-  const openModal = (newModal: JSX.Element | JSX.Element[]) => {
+  const openModal = (
+    newModal: JSX.Element | JSX.Element[],
+    userCloseArg = true
+  ) => {
     setModal(newModal);
+    setUserClose(userCloseArg);
   };
 
   const closeModal = () => {
@@ -47,7 +52,7 @@ const ModalManager = ({
       <Portal>
         <motion.div
           className="z-40 flex min-h-full w-full items-center justify-center bg-black/60 backdrop-blur-md"
-          onClick={closeModal}
+          onClick={() => userClose && closeModal()}
           variants={bgAnimation}
           initial="closed"
           animate={modal ? 'opened' : 'closed'}
@@ -62,12 +67,14 @@ const ModalManager = ({
                 onClick={(e) => e.stopPropagation()}
                 className="relative flex w-full max-w-[20rem] flex-col items-center rounded-lg bg-zinc-900 p-6 sm:w-auto sm:min-w-[20rem] sm:max-w-none"
               >
-                <button
-                  className="absolute right-1 top-1 rounded-lg p-2 text-lg transition-transform hover:scale-105 active:scale-100"
-                  onClick={closeModal}
-                >
-                  <AiOutlineClose />
-                </button>
+                {userClose && (
+                  <button
+                    className="absolute right-1 top-1 rounded-lg p-2 text-lg transition-transform hover:scale-105 active:scale-100"
+                    onClick={closeModal}
+                  >
+                    <AiOutlineClose />
+                  </button>
+                )}
 
                 {modal}
               </motion.div>
