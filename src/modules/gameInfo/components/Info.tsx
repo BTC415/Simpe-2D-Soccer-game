@@ -3,7 +3,7 @@ import { PLAYER_SIZE } from '@/common/constants/settings';
 const Info = () => {
   return (
     <div
-      className="absolute z-20 flex w-full items-center bg-black/40 backdrop-blur-sm"
+      className="absolute z-30 flex w-full items-center bg-black/40 backdrop-blur-sm"
       style={{ height: PLAYER_SIZE * 2 }}
     >
       <div className="flex w-full items-center justify-center gap-72 text-3xl">

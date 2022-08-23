@@ -11,6 +11,8 @@ export const DEFAULT_GAME: Game = {
   scores: [0, 0],
   secondsLeft: 300,
   players: new Map(),
+  paused: false,
+  started: false,
 };
 
 const gameContext = createContext<{

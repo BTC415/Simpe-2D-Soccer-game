@@ -9,6 +9,8 @@ export type Game = {
   scores: [number, number];
   secondsLeft: number;
   players: Map<string, Player>;
+  paused: boolean;
+  started: boolean;
 };
 
 export enum StatusPeer {

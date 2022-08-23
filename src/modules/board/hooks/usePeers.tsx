@@ -7,12 +7,13 @@ import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
 import { StatusPeer } from '@/common/types/game.type';
 import { Loader, Error } from '@/modules/loader';
+import Menu from '@/modules/menu';
 import { useModal } from '@/modules/modal';
 
 export const usePeers = () => {
   const { game, setAdmin, setGame, setStatus, status } = useGame();
   const { admin } = game;
-  const { openModal, closeModal } = useModal();
+  const { openModal } = useModal();
 
   const [peers, setPeers] = useState<Map<string, Peer.Instance>>(new Map());
   const [names, setNames] = useState<Map<string, string>>(new Map());
@@ -89,6 +90,7 @@ export const usePeers = () => {
         peer.removeAllListeners('error');
       };
     }
+    if (admin.id === socket.id) setStatus(StatusPeer.CONNECTED);
 
     return () => {};
   }, [admin.id, peers, setStatus]);
@@ -121,7 +123,10 @@ export const usePeers = () => {
   useEffect(() => {
     if (status === StatusPeer.CONNECTING) openModal(<Loader />, false);
     else if (status === StatusPeer.ERROR) openModal(<Error />, false);
-    else if (status === StatusPeer.CONNECTED) closeModal();
+    else if (status === StatusPeer.CONNECTED && game.started)
+      openModal(<Menu />);
+    else if (status === StatusPeer.CONNECTED && !game.started)
+      openModal(<Menu />, false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);

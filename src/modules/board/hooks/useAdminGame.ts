@@ -58,8 +58,10 @@ export const useAdminGame = (
 
     if (socket.id === admin.id) {
       gameplay = setInterval(() => {
-        players.current = handlePlayersMovement(players.current);
-        setPlayersState(players.current);
+        if (!game.paused && game.started) {
+          players.current = handlePlayersMovement(players.current);
+          setPlayersState(players.current);
+        }
 
         peers.forEach((peer) => {
           if (peer.connected)

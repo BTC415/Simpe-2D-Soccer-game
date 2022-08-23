@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react';
 
+import { DEFAULT_GAME } from '@/common/context/gameContext';
+import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
+import { useModal } from '@/modules/modal';
 
 import GameInputs from './GameInputs';
 import Header from './Header';
 
 const Home = () => {
+  const { setGame } = useGame();
+  const { closeModal } = useModal();
+
   const [name, setName] = useState('');
 
   useEffect(() => {
+    closeModal();
+    setGame(DEFAULT_GAME);
     socket.emit('leave_game');
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -9,7 +9,7 @@ const Toggler = () => {
   const { openModal } = useModal();
 
   return (
-    <div className="absolute top-0 left-0 z-20 flex h-full w-full items-end">
+    <div className="absolute top-0 left-0 z-30 flex h-full w-full items-end">
       <div
         className="flex w-full items-center justify-center bg-black/40 backdrop-blur-sm"
         style={{ height: PLAYER_SIZE * 2 }}
