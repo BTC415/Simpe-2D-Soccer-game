@@ -1,5 +1,5 @@
 import { MOVE, PLAYER_SIZE } from '@/common/constants/settings';
-import { Player } from '@/common/types/player.type';
+import { Player, PlayerTeam } from '@/common/types/player.type';
 
 import { makePosition } from './makePosition';
 
@@ -10,6 +10,8 @@ export const handlePlayersMovement = (
 
   newPlayers.forEach((player, id) => {
     const { direction, velocityVector, position } = player;
+
+    if (player.team === PlayerTeam.SPECTATOR) return;
 
     if (direction.x === 1) {
       velocityVector.x = Math.min(

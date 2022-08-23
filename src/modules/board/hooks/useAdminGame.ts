@@ -7,7 +7,6 @@ import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
 import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
-import type { Game } from '@/common/types/game.type';
 import {
   Data,
   DataType,
@@ -44,7 +43,7 @@ export const useAdminGame = (
   },
   Map<string, Player>
 ] => {
-  const { game, prevGame, setGame } = useGame();
+  const { game, prevGame, setGame, removePlayer } = useGame();
   const { admin } = game;
 
   const players = useRef<Map<string, Player>>(new Map());
@@ -56,7 +55,6 @@ export const useAdminGame = (
 
   useEffect(() => {
     let gameplay: NodeJS.Timeout;
-    let updateGame: NodeJS.Timeout;
 
     if (socket.id === admin.id) {
       gameplay = setInterval(() => {
@@ -73,35 +71,29 @@ export const useAdminGame = (
             );
         });
       }, 1000 / TICKRATE);
-
-      updateGame = setInterval(() => {
-        const newGame: Game = {
-          ...game,
-          players: players.current,
-          id: gameId?.toString() || '',
-          secondsLeft: game.secondsLeft - 1,
-        };
-        setGame(newGame);
-        peers.forEach((peer) => {
-          if (peer.connected)
-            peer.send(
-              JSON.stringify({
-                type: DataType.GAME,
-                game: {
-                  ...newGame,
-                  players: [...players.current],
-                },
-              } as any as GameData)
-            );
-        });
-      }, 1000);
     }
 
     return () => {
       clearInterval(gameplay);
-      clearInterval(updateGame);
     };
   }, [admin.id, game, gameId, peers, setGame]);
+
+  useEffect(() => {
+    let updateGame: NodeJS.Timeout;
+    if (socket.id === admin.id)
+      updateGame = setInterval(() => {
+        setGame((prev) => ({
+          ...prev,
+          players: players.current,
+          id: gameId?.toString() || '',
+          secondsLeft: prev.secondsLeft - 1,
+        }));
+      }, 1000);
+
+    return () => {
+      clearInterval(updateGame);
+    };
+  }, [admin.id, gameId, setGame]);
 
   useEffect(() => {
     if (
@@ -115,6 +107,24 @@ export const useAdminGame = (
       setGame(game);
     }
   }, [admin.id, game, prevGame.admin.id, setGame]);
+
+  useEffect(() => {
+    players.current = game.players;
+    setPlayersState(game.players);
+
+    peers.forEach((peer) => {
+      if (peer.connected)
+        peer.send(
+          JSON.stringify({
+            type: DataType.GAME,
+            game: {
+              ...game,
+              players: [...players.current],
+            },
+          } as any as GameData)
+        );
+    });
+  }, [game, peers]);
 
   useEffect(() => {
     if (players.current.has(admin.id))
@@ -200,23 +210,13 @@ export const useAdminGame = (
   }, [admin.id, names, peers]);
 
   useEffect(() => {
-    const handlePlayerRemove = (id: string) => players.current.delete(id);
+    const handlePlayerRemove = (id: string) => removePlayer(id);
     socket.on('player_left', handlePlayerRemove);
-
-    // const handleAdminChange = (newAdminId: string) => {
-    //   if (newAdminId === socket.id) {
-    //     console.log('123');
-    //     players.current = game.players;
-    //     setPlayersState(game.players);
-    //   }
-    // };
-    // socket.on('admin_change', handleAdminChange);
 
     return () => {
       socket.off('player_left', handlePlayerRemove);
-      // socket.off('admin_change', handleAdminChange);
     };
-  }, [game.players]);
+  }, [removePlayer]);
 
   return [makeEasyPositions(playersState), playersState];
 };

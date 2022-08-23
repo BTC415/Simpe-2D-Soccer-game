@@ -1,22 +1,66 @@
-const Team = ({ team }: { team: 'blue' | 'spectator' | 'red' }) => {
+import { DragEvent } from 'react';
+
+import { useGame } from '@/common/hooks/useGame';
+import { Player, PlayerTeam } from '@/common/types/player.type';
+import { socket } from '@/common/libs/socket';
+
+const Team = ({ team }: { team: PlayerTeam }) => {
+  const { game, setPlayerTeam } = useGame();
+
+  const playersToRender: Map<string, Player> = new Map();
+  game.players.forEach((player, id) => {
+    if (player.team === team) playersToRender.set(id, player);
+  });
+
+  const handleDropPlayer = (e: DragEvent<HTMLDivElement>) => {
+    const playerId = e.dataTransfer.getData('text/plain');
+
+    setPlayerTeam(playerId, team);
+  };
+
   return (
     <div className="flex h-96 w-72 flex-col gap-3">
       <button
         className={`rounded-lg py-1 font-bold transition-colors
         ${
-          team === 'blue' && 'bg-blue-500/50 text-blue-200 hover:bg-blue-600/50'
+          team === PlayerTeam.BLUE &&
+          'bg-blue-500/50 text-blue-200 hover:bg-blue-600/50'
         }
         ${
-          team === 'spectator' &&
+          team === PlayerTeam.SPECTATOR &&
           'bg-gray-500/50 text-gray-200 hover:bg-gray-600/50'
         }
-        ${team === 'red' && 'bg-red-500/50 text-red-200 hover:bg-red-600/50'}`}
+        ${
+          team === PlayerTeam.RED &&
+          'bg-red-500/50 text-red-200 hover:bg-red-600/50'
+        }`}
       >
-        {team === 'blue' && 'Blue team'}
-        {team === 'spectator' && 'Spectator'}
-        {team === 'red' && 'Red team'}
+        {team === PlayerTeam.BLUE && 'Blue team'}
+        {team === PlayerTeam.SPECTATOR && 'Spectator'}
+        {team === PlayerTeam.RED && 'Red team'}
       </button>
-      <div className="flex-1 rounded-lg bg-black"></div>
+      <div
+        className="flex flex-1 flex-col gap-3 rounded-lg bg-black p-5"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDropPlayer}
+      >
+        {[...playersToRender].map(([id, player]) => {
+          return (
+            <div
+              key={id}
+              draggable={socket.id === game.admin.id}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', id);
+              }}
+              className={`${
+                socket.id === game.admin.id && 'cursor-grab'
+              } rounded-lg border-2 border-zinc-900 p-1 px-4`}
+            >
+              {player.name}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -24,9 +68,9 @@ const Team = ({ team }: { team: 'blue' | 'spectator' | 'red' }) => {
 const TeamSelect = () => {
   return (
     <div className="mt-5 flex gap-5">
-      <Team team="blue" />
-      <Team team="spectator" />
-      <Team team="red" />
+      <Team team={PlayerTeam.BLUE} />
+      <Team team={PlayerTeam.SPECTATOR} />
+      <Team team={PlayerTeam.RED} />
     </div>
   );
 };
