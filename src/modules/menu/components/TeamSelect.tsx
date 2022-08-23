@@ -1,8 +1,8 @@
 import { DragEvent } from 'react';
 
 import { useGame } from '@/common/hooks/useGame';
-import { Player, PlayerTeam } from '@/common/types/player.type';
 import { socket } from '@/common/libs/socket';
+import { Player, PlayerTeam } from '@/common/types/player.type';
 
 const Team = ({ team }: { team: PlayerTeam }) => {
   const { game, setPlayerTeam } = useGame();
