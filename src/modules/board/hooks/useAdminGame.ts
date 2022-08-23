@@ -230,7 +230,6 @@ export const useAdminGame = (
 
       toast(`${game.players.get(id)?.name || ''} left the game`, {
         type: 'info',
-        theme: 'dark',
       });
 
       removePlayer(id);

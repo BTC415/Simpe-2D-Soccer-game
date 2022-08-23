@@ -16,7 +16,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <title>BALLZONE - play now!</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ToastContainer />
+      <ToastContainer theme="dark" />
       <MotionConfig transition={{ ease: [0.6, 0.01, -0.05, 0.9] }}>
         <GameProvider>
           <ModalManager>

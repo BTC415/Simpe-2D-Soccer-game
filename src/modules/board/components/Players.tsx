@@ -61,7 +61,6 @@ const Players = () => {
               } the game`,
               {
                 type: 'info',
-                theme: 'dark',
               }
             );
           }

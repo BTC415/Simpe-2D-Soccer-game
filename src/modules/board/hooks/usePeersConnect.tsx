@@ -34,15 +34,12 @@ export const usePeersConnect = () => {
 
       const finalName = getName(id, { game, names }, name).name;
 
-      const toastId = toast.loading(`${finalName} is connecting`, {
-        theme: 'dark',
-      });
+      const toastId = toast.loading(`${finalName} is connecting`);
 
       promise.then(() =>
         toast.update(toastId, {
           render: `${finalName} joined the game`,
           type: 'info',
-          theme: 'dark',
           isLoading: false,
           autoClose: 5000,
         })
