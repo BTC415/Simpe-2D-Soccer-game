@@ -34,8 +34,7 @@ const Players = () => {
   const { peers, names } = usePeers();
   const [adminPlayersPositions, adminPlayers] = useAdminGame(
     { peers, names },
-    direction,
-    game
+    direction
   );
 
   useEffect(() => {

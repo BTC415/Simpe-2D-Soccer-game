@@ -37,8 +37,7 @@ export const useAdminGame = (
     peers: Map<string, Peer.Instance>;
     names: Map<string, string>;
   },
-  direction: Direction,
-  gameFromAdmin?: Game
+  direction: Direction
 ): [
   {
     [key: string]: [number, number];
@@ -80,6 +79,7 @@ export const useAdminGame = (
           ...game,
           players: players.current,
           id: gameId?.toString() || '',
+          secondsLeft: game.secondsLeft - 1,
         };
         setGame(newGame);
         peers.forEach((peer) => {
@@ -105,26 +105,29 @@ export const useAdminGame = (
 
   useEffect(() => {
     if (
-      gameFromAdmin?.players.size &&
+      game.players.size &&
       admin.id === socket.id &&
       prevGame.admin.id !== admin.id
     ) {
-      gameFromAdmin.players.delete(prevGame.admin.id);
-      players.current = gameFromAdmin.players;
+      game.players.delete(prevGame.admin.id);
+      players.current = game.players;
       setPlayersState(players.current);
+      setGame(game);
     }
-  }, [admin.id, gameFromAdmin?.players, prevGame.admin.id]);
+  }, [admin.id, game, prevGame.admin.id, setGame]);
 
   useEffect(() => {
-    players.current.set(admin.id, {
-      ...players.current.get(admin.id)!,
-      direction,
-    });
+    if (players.current.has(admin.id))
+      players.current.set(admin.id, {
+        ...players.current.get(admin.id)!,
+        direction,
+      });
   }, [admin.id, direction]);
 
   useEffect(() => {
-    if (admin.id === socket.id) {
+    if (admin.id === socket.id && !players.current.has(admin.id))
       players.current.set(admin.id, {
+        index: 1,
         name: admin.name || 'Player 1',
         position: {
           x: 200,
@@ -137,26 +140,38 @@ export const useAdminGame = (
         team: PlayerTeam.BLUE,
         direction: { x: 0, y: 0 },
       });
-    }
   }, [admin.id, admin.name]);
 
   useEffect(() => {
     if (socket.id === admin.id) {
       peers.forEach((peer, id) => {
         peer.on('connect', () => {
-          players.current.set(id, {
-            name: names.get(id) || `Player ${players.current.size + 1}`,
-            position: {
-              x: REAL_BOARD_SIZE.width - 200,
-              y: REAL_BOARD_SIZE.height / 2,
-            },
-            velocityVector: {
-              x: 0,
-              y: 0,
-            },
-            team: PlayerTeam.RED,
-            direction: { x: 0, y: 0 },
-          });
+          if (!players.current.has(id)) {
+            let newIndex = 0;
+            do {
+              newIndex += 1;
+            } while (
+              [...players.current.values()].some(
+                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                (player) => player.index === newIndex
+              )
+            );
+
+            players.current.set(id, {
+              index: newIndex,
+              name: names.get(id) || `Player ${newIndex}`,
+              position: {
+                x: REAL_BOARD_SIZE.width - 200,
+                y: REAL_BOARD_SIZE.height / 2,
+              },
+              velocityVector: {
+                x: 0,
+                y: 0,
+              },
+              team: PlayerTeam.RED,
+              direction: { x: 0, y: 0 },
+            });
+          }
         });
 
         peer.on('data', (data: Uint8Array) => {
@@ -188,10 +203,20 @@ export const useAdminGame = (
     const handlePlayerRemove = (id: string) => players.current.delete(id);
     socket.on('player_left', handlePlayerRemove);
 
+    // const handleAdminChange = (newAdminId: string) => {
+    //   if (newAdminId === socket.id) {
+    //     console.log('123');
+    //     players.current = game.players;
+    //     setPlayersState(game.players);
+    //   }
+    // };
+    // socket.on('admin_change', handleAdminChange);
+
     return () => {
       socket.off('player_left', handlePlayerRemove);
+      // socket.off('admin_change', handleAdminChange);
     };
-  }, []);
+  }, [game.players]);
 
   return [makeEasyPositions(playersState), playersState];
 };

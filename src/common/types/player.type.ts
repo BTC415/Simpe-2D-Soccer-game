@@ -12,6 +12,7 @@ export enum PlayerTeam {
 }
 
 export interface Player {
+  index: number;
   name: string;
   team: PlayerTeam;
   position: { x: number; y: number };
