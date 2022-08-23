@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
@@ -12,11 +13,13 @@ import {
   DataType,
   DirectionData,
   GameData,
+  PlayerJoinLeftData,
   PositionData,
   TeamChangeData,
 } from '@/common/types/peer.type';
 import { Direction, Player, PlayerTeam } from '@/common/types/player.type';
 
+import { getName } from '../helpers/getName';
 import { handlePlayersMovement } from '../helpers/handlePlayersMovement';
 
 const makeEasyPositions = (players: Map<string, Player>) => {
@@ -155,19 +158,22 @@ export const useAdminGame = (
       peers.forEach((peer, id) => {
         peer.on('connect', () => {
           if (!players.current.has(id)) {
-            let newIndex = 0;
-            do {
-              newIndex += 1;
-            } while (
-              [...players.current.values()].some(
-                // eslint-disable-next-line @typescript-eslint/no-loop-func
-                (player) => player.index === newIndex
-              )
-            );
+            const { name, newIndex } = getName(id, { game, names });
+
+            peers.forEach((peer1, id1) => {
+              if (id1 === id) return;
+              peer1.send(
+                JSON.stringify({
+                  type: DataType.PLAYER_JOIN_LEFT,
+                  join: true,
+                  name,
+                } as PlayerJoinLeftData)
+              );
+            });
 
             players.current.set(id, {
               index: newIndex,
-              name: names.get(id) || `Player ${newIndex}`,
+              name,
               position: {
                 x: REAL_BOARD_SIZE.width - 200,
                 y: REAL_BOARD_SIZE.height / 2,
@@ -211,13 +217,30 @@ export const useAdminGame = (
   }, [admin.id, names, peers]);
 
   useEffect(() => {
-    const handlePlayerRemove = (id: string) => removePlayer(id);
+    const handlePlayerRemove = (id: string) => {
+      peers.forEach((peer) => {
+        peer.send(
+          JSON.stringify({
+            type: DataType.PLAYER_JOIN_LEFT,
+            join: false,
+            name: game.players.get(id)?.name || '',
+          } as PlayerJoinLeftData)
+        );
+      });
+
+      toast(`${game.players.get(id)?.name || ''} left the game`, {
+        type: 'info',
+        theme: 'dark',
+      });
+
+      removePlayer(id);
+    };
     socket.on('player_left', handlePlayerRemove);
 
     return () => {
       socket.off('player_left', handlePlayerRemove);
     };
-  }, [removePlayer]);
+  }, [game.players, peers, removePlayer]);
 
   return [makeEasyPositions(playersState), playersState];
 };

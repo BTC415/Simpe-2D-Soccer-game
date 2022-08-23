@@ -7,6 +7,7 @@ export enum DataType {
   DIRECTION,
   SHOOT,
   TEAM_CHANGE,
+  PLAYER_JOIN_LEFT,
 }
 
 export type Data = {
@@ -18,6 +19,12 @@ export type PositionData = {
   positions: {
     [key: string]: [number, number];
   };
+};
+
+export type PlayerJoinLeftData = {
+  type: DataType.PLAYER_JOIN_LEFT;
+  join: boolean;
+  name: string;
 };
 
 export type GameData = {

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { toast } from 'react-toastify';
+
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
@@ -9,6 +11,7 @@ import {
   Data,
   DataType,
   GameData,
+  PlayerJoinLeftData,
   PositionData,
 } from '@/common/types/peer.type';
 import { PlayerTeam } from '@/common/types/player.type';
@@ -43,13 +46,24 @@ const Players = () => {
 
           if (parsedData.type === DataType.POSITIONS)
             setPlayersPositions((parsedData as PositionData).positions);
-
-          if (parsedData.type === DataType.GAME) {
+          else if (parsedData.type === DataType.GAME) {
             const gameFromAdmin = (parsedData as GameData).game;
             setGame({
               ...gameFromAdmin,
               players: new Map(gameFromAdmin.players),
             });
+          } else if (parsedData.type === DataType.PLAYER_JOIN_LEFT) {
+            const typedData = parsedData as PlayerJoinLeftData;
+
+            toast(
+              `${typedData.name} ${
+                typedData.join ? 'joined' : 'left'
+              } the game`,
+              {
+                type: 'info',
+                theme: 'dark',
+              }
+            );
           }
         });
       }

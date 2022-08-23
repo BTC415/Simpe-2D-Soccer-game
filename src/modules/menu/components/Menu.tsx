@@ -33,6 +33,12 @@ const Menu = () => {
         </p>
       )}
 
+      {!game.paused && game.started && (
+        <p className="text-center text-2xl font-bold text-green-500">
+          GAME IS RUNNING
+        </p>
+      )}
+
       <p className="text-center text-lg">
         Room id: <span className="font-bold text-green-500">{gameId}</span>
       </p>

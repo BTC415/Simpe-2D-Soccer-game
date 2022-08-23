@@ -1,4 +1,10 @@
-import { createContext, Dispatch, SetStateAction, useState } from 'react';
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 import type SimplePeer from 'simple-peer';
 
@@ -19,6 +25,7 @@ export const DEFAULT_GAME: Game = {
 
 const gameContext = createContext<{
   game: Game;
+  prevGame: Game;
   setGame: Dispatch<SetStateAction<Game>>;
   status: StatusPeer;
   setStatus: Dispatch<SetStateAction<StatusPeer>>;
@@ -31,16 +38,24 @@ const GameProvider = ({
 }: {
   children: JSX.Element | JSX.Element[];
 }) => {
-  const [game, setGame] = useState<Game>(DEFAULT_GAME);
+  const [game, setGame] = useState(DEFAULT_GAME);
+  const [prevGame, setPrevGame] = useState(DEFAULT_GAME);
   const [status, setStatus] = useState<StatusPeer>(StatusPeer.CONNECTED);
   const [peers, setPeers] = useState<Map<string, SimplePeer.Instance>>(
     new Map()
   );
 
+  useEffect(() => {
+    return () => {
+      setPrevGame(game);
+    };
+  }, [game]);
+
   return (
     <gameContext.Provider
       value={{
         game,
+        prevGame,
         setGame,
         status,
         setStatus,

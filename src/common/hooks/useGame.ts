@@ -1,18 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '../constants/settings';
 import { gameContext } from '../context/gameContext';
 import { PlayerTeam } from '../types/player.type';
 
 export const useGame = () => {
-  const { game, setGame, setStatus, status } = useContext(gameContext);
-  const [prevGame, setPrevGame] = useState(game);
-
-  useEffect(() => {
-    return () => {
-      setPrevGame(game);
-    };
-  }, [game]);
+  const { game, setGame, setStatus, status, prevGame } =
+    useContext(gameContext);
 
   const setAdmin = (newAdmin: { id: string; name?: string }) => {
     setGame((prev) => ({

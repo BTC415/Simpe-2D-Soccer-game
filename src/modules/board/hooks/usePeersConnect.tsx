@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { toast } from 'react-toastify';
 import Peer from 'simple-peer';
 
 import { DEFAULT_GAME } from '@/common/context/gameContext';
@@ -10,6 +11,8 @@ import { StatusPeer } from '@/common/types/game.type';
 import { Loader, Error } from '@/modules/loader';
 import Menu from '@/modules/menu';
 import { useModal } from '@/modules/modal';
+
+import { getName } from '../helpers/getName';
 
 export const usePeersConnect = () => {
   const { peers, setPeers } = usePeers();
@@ -24,6 +27,26 @@ export const usePeersConnect = () => {
       const peer = new Peer({
         initiator: false,
       });
+
+      const promise = new Promise((resolve) => {
+        peer.on('connect', () => resolve('resolve'));
+      });
+
+      const finalName = getName(id, { game, names }, name).name;
+
+      const toastId = toast.loading(`${finalName} is connecting`, {
+        theme: 'dark',
+      });
+
+      promise.then(() =>
+        toast.update(toastId, {
+          render: `${finalName} joined the game`,
+          type: 'info',
+          theme: 'dark',
+          isLoading: false,
+          autoClose: 5000,
+        })
+      );
 
       if (!peers.has(id)) setPeers((prev) => new Map(prev).set(id, peer));
       if (!names.has(id)) setNames((prev) => new Map(prev).set(id, name));
@@ -74,7 +97,7 @@ export const usePeersConnect = () => {
       socket.off('player_signal');
       socket.off('admin_change');
     };
-  }, [admin.id, game.players, names, peers, setAdmin, setGame, setPeers]);
+  }, [admin.id, game, game.players, names, peers, setAdmin, setGame, setPeers]);
 
   useEffect(() => {
     if (admin.id && admin.id !== socket.id && !peers.has(admin.id)) {
