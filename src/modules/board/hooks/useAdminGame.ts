@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
-import Peer from 'simple-peer';
 
 import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
+import { usePeers } from '@/common/hooks/usePeers';
 import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
 import {
@@ -13,6 +13,7 @@ import {
   DirectionData,
   GameData,
   PositionData,
+  TeamChangeData,
 } from '@/common/types/peer.type';
 import { Direction, Player, PlayerTeam } from '@/common/types/player.type';
 
@@ -29,13 +30,7 @@ const makeEasyPositions = (players: Map<string, Player>) => {
 };
 
 export const useAdminGame = (
-  {
-    peers,
-    names,
-  }: {
-    peers: Map<string, Peer.Instance>;
-    names: Map<string, string>;
-  },
+  names: Map<string, string>,
   direction: Direction
 ): [
   {
@@ -43,8 +38,9 @@ export const useAdminGame = (
   },
   Map<string, Player>
 ] => {
-  const { game, prevGame, setGame, removePlayer } = useGame();
+  const { game, prevGame, setGame, removePlayer, setPlayerTeam } = useGame();
   const { admin } = game;
+  const { peers } = usePeers();
 
   const players = useRef<Map<string, Player>>(new Map());
   const [playersState, setPlayersState] = useState<Map<string, Player>>(
@@ -198,7 +194,8 @@ export const useAdminGame = (
             });
           } else if (parsedData.type === DataType.SHOOT) {
             // TODO: handle shoot
-          }
+          } else if (parsedData.type === DataType.TEAM_CHANGE)
+            setPlayerTeam(id, (parsedData as TeamChangeData).team);
         });
       });
     }
@@ -209,6 +206,8 @@ export const useAdminGame = (
         peer.removeAllListeners('data');
       });
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [admin.id, names, peers]);
 
   useEffect(() => {

@@ -1,11 +1,14 @@
 import { DragEvent } from 'react';
 
 import { useGame } from '@/common/hooks/useGame';
+import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
+import { DataType, TeamChangeData } from '@/common/types/peer.type';
 import { Player, PlayerTeam } from '@/common/types/player.type';
 
 const Team = ({ team }: { team: PlayerTeam }) => {
   const { game, setPlayerTeam } = useGame();
+  const { adminPeer } = usePeers();
 
   const playersToRender: Map<string, Player> = new Map();
   game.players.forEach((player, id) => {
@@ -18,10 +21,24 @@ const Team = ({ team }: { team: PlayerTeam }) => {
     setPlayerTeam(playerId, team);
   };
 
+  const handleTeamChange = () => {
+    if (game.admin.id === socket.id) setPlayerTeam(socket.id, team);
+    else if (!game.started && adminPeer && adminPeer.connected) {
+      adminPeer.send(
+        JSON.stringify({
+          type: DataType.TEAM_CHANGE,
+          team,
+        } as TeamChangeData)
+      );
+    }
+  };
+
   return (
     <div className="flex h-96 w-72 flex-col gap-3">
       <button
-        className={`rounded-lg py-1 font-bold transition-colors
+        onClick={handleTeamChange}
+        disabled={game.started}
+        className={`rounded-lg py-1 font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50
         ${
           team === PlayerTeam.BLUE &&
           'bg-blue-500/50 text-blue-200 hover:bg-blue-600/50'

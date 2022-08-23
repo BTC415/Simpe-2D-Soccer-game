@@ -1,5 +1,7 @@
 import { createContext, Dispatch, SetStateAction, useState } from 'react';
 
+import type SimplePeer from 'simple-peer';
+
 import { Game, StatusPeer } from '../types/game.type';
 
 export const DEFAULT_GAME: Game = {
@@ -20,6 +22,8 @@ const gameContext = createContext<{
   setGame: Dispatch<SetStateAction<Game>>;
   status: StatusPeer;
   setStatus: Dispatch<SetStateAction<StatusPeer>>;
+  peers: Map<string, SimplePeer.Instance>;
+  setPeers: Dispatch<SetStateAction<Map<string, SimplePeer.Instance>>>;
 }>(null!);
 
 const GameProvider = ({
@@ -29,6 +33,9 @@ const GameProvider = ({
 }) => {
   const [game, setGame] = useState<Game>(DEFAULT_GAME);
   const [status, setStatus] = useState<StatusPeer>(StatusPeer.CONNECTED);
+  const [peers, setPeers] = useState<Map<string, SimplePeer.Instance>>(
+    new Map()
+  );
 
   return (
     <gameContext.Provider
@@ -37,6 +44,8 @@ const GameProvider = ({
         setGame,
         status,
         setStatus,
+        peers,
+        setPeers,
       }}
     >
       {children}

@@ -1,11 +1,12 @@
 import { Game } from './game.type';
-import { Direction } from './player.type';
+import { Direction, PlayerTeam } from './player.type';
 
 export enum DataType {
-  POSITIONS = 0,
-  GAME = 1,
-  DIRECTION = 2,
-  SHOOT = 3,
+  POSITIONS,
+  GAME,
+  DIRECTION,
+  SHOOT,
+  TEAM_CHANGE,
 }
 
 export type Data = {
@@ -31,4 +32,9 @@ export type DirectionData = {
 
 export type ShootData = {
   type: DataType.SHOOT;
+};
+
+export type TeamChangeData = {
+  type: DataType.TEAM_CHANGE;
+  team: PlayerTeam;
 };

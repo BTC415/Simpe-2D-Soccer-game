@@ -4,18 +4,19 @@ import Peer from 'simple-peer';
 
 import { DEFAULT_GAME } from '@/common/context/gameContext';
 import { useGame } from '@/common/hooks/useGame';
+import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
 import { StatusPeer } from '@/common/types/game.type';
 import { Loader, Error } from '@/modules/loader';
 import Menu from '@/modules/menu';
 import { useModal } from '@/modules/modal';
 
-export const usePeers = () => {
+export const usePeersConnect = () => {
+  const { peers, setPeers } = usePeers();
   const { game, setAdmin, setGame, setStatus, status } = useGame();
   const { admin } = game;
   const { openModal } = useModal();
 
-  const [peers, setPeers] = useState<Map<string, Peer.Instance>>(new Map());
   const [names, setNames] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export const usePeers = () => {
       socket.off('player_signal');
       socket.off('admin_change');
     };
-  }, [admin.id, game.players, names, peers, setAdmin, setGame]);
+  }, [admin.id, game.players, names, peers, setAdmin, setGame, setPeers]);
 
   useEffect(() => {
     if (admin.id && admin.id !== socket.id && !peers.has(admin.id)) {
@@ -93,7 +94,7 @@ export const usePeers = () => {
     if (admin.id === socket.id) setStatus(StatusPeer.CONNECTED);
 
     return () => {};
-  }, [admin.id, peers, setStatus]);
+  }, [admin.id, peers, setPeers, setStatus]);
 
   useEffect(() => {
     peers.forEach((peer, id) => {
@@ -131,5 +132,5 @@ export const usePeers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  return { peers, names };
+  return names;
 };

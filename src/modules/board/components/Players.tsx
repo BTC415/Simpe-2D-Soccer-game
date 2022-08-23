@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
+import { usePeers } from '@/common/hooks/usePeers';
 import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
 import {
   Data,
   DataType,
-  DirectionData,
   GameData,
   PositionData,
 } from '@/common/types/peer.type';
@@ -16,12 +16,13 @@ import { PlayerTeam } from '@/common/types/player.type';
 import { useAdminGame } from '../hooks/useAdminGame';
 import { useCamera } from '../hooks/useCamera';
 import { useKeysDirection } from '../hooks/useKeysDirection';
-import { usePeers } from '../hooks/usePeers';
+import { usePeersConnect } from '../hooks/usePeersConnect';
 
 const Players = () => {
   const { setPosition, camX, camY, position } = useCamera();
   const { game, setGame } = useGame();
   const { admin } = game;
+  const { adminPeer } = usePeers();
 
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -31,16 +32,11 @@ const Players = () => {
 
   const direction = useKeysDirection();
 
-  const { peers, names } = usePeers();
-  const [adminPlayersPositions, adminPlayers] = useAdminGame(
-    { peers, names },
-    direction
-  );
+  const names = usePeersConnect();
+  const [adminPlayersPositions, adminPlayers] = useAdminGame(names, direction);
 
   useEffect(() => {
     if (admin.id !== socket.id) {
-      const adminPeer = peers.get(admin.id);
-
       if (adminPeer) {
         adminPeer.on('data', (data: Uint8Array) => {
           const parsedData = JSON.parse(decoder.decode(data)) as Data;
@@ -66,22 +62,7 @@ const Players = () => {
     }
 
     return () => {};
-  }, [admin.id, peers, setGame]);
-
-  useEffect(() => {
-    if (admin.id !== socket.id) {
-      const adminPeer = peers.get(admin.id);
-
-      if (adminPeer && adminPeer.connected) {
-        adminPeer.send(
-          JSON.stringify({
-            type: DataType.DIRECTION,
-            direction,
-          } as DirectionData)
-        );
-      }
-    }
-  }, [admin.id, direction, peers]);
+  }, [admin.id, adminPeer, setGame]);
 
   const finalPlayersPositions =
     admin.id === socket.id ? adminPlayersPositions : playersPositions;
