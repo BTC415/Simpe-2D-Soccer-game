@@ -2,7 +2,7 @@ import { useContext } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '../constants/settings';
 import { gameContext } from '../context/gameContext';
-import { PlayerTeam } from '../types/player.type';
+import { Player, PlayerTeam } from '../types/player.type';
 
 export const useGame = () => {
   const { game, setGame, setStatus, status, prevGame } =
@@ -45,6 +45,32 @@ export const useGame = () => {
     });
   };
 
+  const stopGame = () => {
+    setGame((prev) => {
+      const newPlayers: Map<string, Player> = new Map();
+
+      prev.players.forEach((player, id) => {
+        newPlayers.set(id, {
+          ...player,
+          team: PlayerTeam.SPECTATOR,
+          position: { x: -100, y: REAL_BOARD_SIZE.height / 2 },
+        });
+      });
+
+      return {
+        ...prev,
+        players: newPlayers,
+        secondsLeft: 300,
+        scores: [0, 0],
+        started: false,
+      };
+    });
+  };
+
+  const startGame = (seconds: number) => {
+    setGame((prev) => ({ ...prev, secondsLeft: seconds, started: true }));
+  };
+
   return {
     game,
     prevGame,
@@ -54,5 +80,7 @@ export const useGame = () => {
     setStatus,
     setPlayerTeam,
     removePlayer,
+    stopGame,
+    startGame,
   };
 };

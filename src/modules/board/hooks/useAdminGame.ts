@@ -41,8 +41,15 @@ export const useAdminGame = (
   },
   Map<string, Player>
 ] => {
-  const { game, prevGame, setGame, removePlayer, setPlayerTeam, setAdmin } =
-    useGame();
+  const {
+    game,
+    prevGame,
+    setGame,
+    removePlayer,
+    setPlayerTeam,
+    setAdmin,
+    stopGame,
+  } = useGame();
   const { admin } = game;
   const { peers } = usePeers();
 
@@ -82,7 +89,7 @@ export const useAdminGame = (
 
   useEffect(() => {
     let updateGame: NodeJS.Timeout;
-    if (socket.id === admin.id)
+    if (socket.id === admin.id && game.started)
       updateGame = setInterval(() => {
         setGame((prev) => ({
           ...prev,
@@ -95,7 +102,12 @@ export const useAdminGame = (
     return () => {
       clearInterval(updateGame);
     };
-  }, [admin.id, gameId, setGame]);
+  }, [admin.id, gameId, setGame, game.started]);
+  useEffect(() => {
+    if (game.secondsLeft < 0) stopGame();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.secondsLeft]);
 
   useEffect(() => {
     if (

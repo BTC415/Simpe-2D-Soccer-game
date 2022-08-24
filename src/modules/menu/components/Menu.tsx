@@ -14,7 +14,7 @@ import { useModal } from '@/modules/modal';
 import TeamSelect from './TeamSelect';
 
 const Menu = () => {
-  const { game, setGame } = useGame();
+  const { game, setGame, startGame, stopGame } = useGame();
   const { closeModal } = useModal();
 
   const { gameId } = useRouter().query;
@@ -50,7 +50,7 @@ const Menu = () => {
           <>
             <button
               className="btn w-40 bg-red-500 from-red-500"
-              onClick={() => setGame((prev) => ({ ...prev, started: false }))}
+              onClick={stopGame}
             >
               <BsFillStopFill />
               Stop game
@@ -79,7 +79,7 @@ const Menu = () => {
         {!game.started && socket.id === game.admin.id && (
           <button
             className="btn w-40 bg-green-500 from-green-500"
-            onClick={() => setGame((prev) => ({ ...prev, started: true }))}
+            onClick={() => startGame(300)}
           >
             <BsFillPlayFill />
             Start game
