@@ -17,11 +17,10 @@ const Home = () => {
   const [name, setName] = useState('');
 
   useEffect(() => {
-    console.log(localStorage.getItem('name'));
     setName(localStorage.getItem('name') || '');
 
     closeModal();
-    setGame(DEFAULT_GAME);
+    setGame({ ...DEFAULT_GAME, players: new Map() });
     peers.forEach((peer) => peer.destroy());
     setPeers(new Map());
     socket.emit('leave_game');

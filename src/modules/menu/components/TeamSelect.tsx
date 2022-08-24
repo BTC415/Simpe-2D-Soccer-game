@@ -37,7 +37,7 @@ const Team = ({ team }: { team: PlayerTeam }) => {
     <div className="flex h-96 w-72 flex-col gap-3">
       <button
         onClick={handleTeamChange}
-        disabled={game.started}
+        disabled={game.started && game.admin.id !== socket.id}
         className={`rounded-lg py-1 font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50
         ${
           team === PlayerTeam.BLUE &&

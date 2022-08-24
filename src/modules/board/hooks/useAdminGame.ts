@@ -154,14 +154,14 @@ export const useAdminGame = (
         index: 1,
         name: admin.name || 'Player 1',
         position: {
-          x: 200,
+          x: -100,
           y: REAL_BOARD_SIZE.height / 2,
         },
         velocityVector: {
           x: 0,
           y: 0,
         },
-        team: PlayerTeam.BLUE,
+        team: PlayerTeam.SPECTATOR,
         direction: { x: 0, y: 0 },
       });
       setAdmin({ id: admin.id, name: admin.name || 'Player 1' });
@@ -191,16 +191,19 @@ export const useAdminGame = (
               index: newIndex,
               name,
               position: {
-                x: REAL_BOARD_SIZE.width - 200,
+                x: -100,
                 y: REAL_BOARD_SIZE.height / 2,
               },
               velocityVector: {
                 x: 0,
                 y: 0,
               },
-              team: PlayerTeam.RED,
+              team: PlayerTeam.SPECTATOR,
               direction: { x: 0, y: 0 },
             });
+
+            setPlayersState(players.current);
+            setGame((prev) => ({ ...prev, players: players.current }));
           }
         });
 

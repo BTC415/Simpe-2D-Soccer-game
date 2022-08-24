@@ -94,7 +94,7 @@ export const usePeersConnect = () => {
           setNames((prev) => new Map(prev).set(id, name));
         });
         setGame(game);
-      } else setGame(DEFAULT_GAME);
+      } else setGame({ ...DEFAULT_GAME, players: new Map() });
       setPeers((prev) => {
         const newPeers = new Map(prev);
 
