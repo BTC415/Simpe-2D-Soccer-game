@@ -17,6 +17,9 @@ const Home = () => {
   const [name, setName] = useState('');
 
   useEffect(() => {
+    console.log(localStorage.getItem('name'));
+    setName(localStorage.getItem('name') || '');
+
     closeModal();
     setGame(DEFAULT_GAME);
     peers.forEach((peer) => peer.destroy());
@@ -38,7 +41,10 @@ const Home = () => {
             className="h-8 w-72 rounded-lg bg-zinc-500/40 px-4 ring-green-500 focus:outline-none focus:ring"
             placeholder="Player"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              localStorage.setItem('name', e.target.value);
+            }}
           />
         </label>
 

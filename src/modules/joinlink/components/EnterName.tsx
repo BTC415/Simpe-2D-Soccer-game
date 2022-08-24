@@ -24,6 +24,8 @@ const EnterName = () => {
   };
 
   useEffect(() => {
+    setName(localStorage.getItem('name') || '');
+
     socket.on('game_joined', (_, id) => {
       setAdmin({ id });
     });
@@ -43,7 +45,10 @@ const EnterName = () => {
           type="text"
           className="input"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            localStorage.setItem('name', e.target.value);
+          }}
           placeholder="Player"
         />
       </label>
