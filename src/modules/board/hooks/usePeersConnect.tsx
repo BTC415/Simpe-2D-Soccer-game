@@ -8,6 +8,7 @@ import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
 import { StatusPeer } from '@/common/types/game.type';
+import { DataType, PlayerJoinLeftData } from '@/common/types/peer.type';
 import { Loader, Error } from '@/modules/loader';
 import Menu from '@/modules/menu';
 import { useModal } from '@/modules/modal';
@@ -29,7 +30,7 @@ export const usePeersConnect = () => {
       });
 
       const promise = new Promise((resolve) => {
-        peer.on('connect', () => resolve('resolve'));
+        peer.once('connect', () => resolve('resolve'));
       });
 
       const finalName = getName(id, { game, names }, name).name;
@@ -46,7 +47,7 @@ export const usePeersConnect = () => {
       );
 
       if (!peers.has(id)) setPeers((prev) => new Map(prev).set(id, peer));
-      if (!names.has(id)) setNames((prev) => new Map(prev).set(id, name));
+      if (!names.has(id)) setNames((prev) => new Map(prev).set(id, finalName));
     });
 
     const handlePeerRemove = (id: string) => {
@@ -67,16 +68,33 @@ export const usePeersConnect = () => {
     });
 
     socket.on('admin_change', (newAdminId) => {
-      if (newAdminId === socket.id)
+      if (newAdminId === socket.id) {
+        const oldAdminName = game.players.get(admin.id)?.name;
+
+        toast(`${oldAdminName} left the game`, { type: 'info' });
+        toast('You are now host', { type: 'info' });
+
+        game.players.delete(game.admin.id);
         game.players.forEach(({ name }, id) => {
           const peer = new Peer({
             initiator: false,
           });
 
+          peer.once('connect', () =>
+            peer.send(
+              JSON.stringify({
+                type: DataType.PLAYER_JOIN_LEFT,
+                join: false,
+                name: oldAdminName || 'Player',
+              } as PlayerJoinLeftData)
+            )
+          );
+
           setPeers((prev) => new Map(prev).set(id, peer));
           setNames((prev) => new Map(prev).set(id, name));
         });
-      else setGame(DEFAULT_GAME);
+        setGame(game);
+      } else setGame(DEFAULT_GAME);
       setPeers((prev) => {
         const newPeers = new Map(prev);
 
@@ -85,7 +103,10 @@ export const usePeersConnect = () => {
 
         return newPeers;
       });
-      setAdmin({ id: newAdminId });
+      setAdmin({
+        id: newAdminId,
+        name: game.players.get(newAdminId)?.name || 'Player',
+      });
     });
 
     return () => {
@@ -94,7 +115,17 @@ export const usePeersConnect = () => {
       socket.off('player_signal');
       socket.off('admin_change');
     };
-  }, [admin.id, game, game.players, names, peers, setAdmin, setGame, setPeers]);
+  }, [
+    admin.id,
+    admin.name,
+    game,
+    game.players,
+    names,
+    peers,
+    setAdmin,
+    setGame,
+    setPeers,
+  ]);
 
   useEffect(() => {
     if (admin.id && admin.id !== socket.id && !peers.has(admin.id)) {
@@ -102,18 +133,13 @@ export const usePeersConnect = () => {
         initiator: true,
       });
 
-      peer.on('error', () => setStatus(StatusPeer.ERROR));
+      peer.once('error', () => setStatus(StatusPeer.ERROR));
 
       setPeers((prev) => new Map(prev).set(admin.id, peer));
       setStatus(StatusPeer.CONNECTING);
-
-      return () => {
-        peer.removeAllListeners('error');
-      };
     }
-    if (admin.id === socket.id) setStatus(StatusPeer.CONNECTED);
 
-    return () => {};
+    if (admin.id === socket.id) setStatus(StatusPeer.CONNECTED);
   }, [admin.id, peers, setPeers, setStatus]);
 
   useEffect(() => {

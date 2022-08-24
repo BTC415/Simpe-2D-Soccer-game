@@ -10,13 +10,14 @@ import GameInfo from '@/modules/gameInfo';
 import { Toggler } from '@/modules/menu';
 
 const GamePage: NextPage = () => {
-  const { setAdmin } = useGame();
+  const { setAdmin, game } = useGame();
 
   const router = useRouter();
 
   useEffect(() => {
     const { gameId } = router.query;
-    if (gameId) socket.emit('join_game', '', gameId.toString());
+    if (gameId && !game.admin.id)
+      socket.emit('join_game', '', gameId.toString());
 
     socket.on('game_joined', (_, id) => {
       setAdmin({ id });

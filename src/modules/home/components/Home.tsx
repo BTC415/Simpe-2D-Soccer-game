@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { DEFAULT_GAME } from '@/common/context/gameContext';
 import { useGame } from '@/common/hooks/useGame';
+import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
 import { useModal } from '@/modules/modal';
 
@@ -10,6 +11,7 @@ import Header from './Header';
 
 const Home = () => {
   const { setGame } = useGame();
+  const { setPeers, peers } = usePeers();
   const { closeModal } = useModal();
 
   const [name, setName] = useState('');
@@ -17,6 +19,8 @@ const Home = () => {
   useEffect(() => {
     closeModal();
     setGame(DEFAULT_GAME);
+    peers.forEach((peer) => peer.destroy());
+    setPeers(new Map());
     socket.emit('leave_game');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

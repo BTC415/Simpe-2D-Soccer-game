@@ -41,7 +41,8 @@ export const useAdminGame = (
   },
   Map<string, Player>
 ] => {
-  const { game, prevGame, setGame, removePlayer, setPlayerTeam } = useGame();
+  const { game, prevGame, setGame, removePlayer, setPlayerTeam, setAdmin } =
+    useGame();
   const { admin } = game;
   const { peers } = usePeers();
 
@@ -136,7 +137,7 @@ export const useAdminGame = (
   }, [admin.id, direction]);
 
   useEffect(() => {
-    if (admin.id === socket.id && !players.current.has(admin.id))
+    if (admin.id === socket.id && !players.current.has(admin.id)) {
       players.current.set(admin.id, {
         index: 1,
         name: admin.name || 'Player 1',
@@ -151,18 +152,21 @@ export const useAdminGame = (
         team: PlayerTeam.BLUE,
         direction: { x: 0, y: 0 },
       });
-  }, [admin.id, admin.name]);
+      setAdmin({ id: admin.id, name: admin.name || 'Player 1' });
+    }
+  }, [admin.id, admin.name, setAdmin]);
 
   useEffect(() => {
     if (socket.id === admin.id) {
       peers.forEach((peer, id) => {
-        peer.on('connect', () => {
+        peer.once('connect', () => {
           if (!players.current.has(id)) {
             const { name, newIndex } = getName(id, { game, names });
 
-            peers.forEach((peer1, id1) => {
-              if (id1 === id) return;
-              peer1.send(
+            peers.forEach((peerNested, idNested) => {
+              if (idNested === id || !peerNested || !peerNested.connected)
+                return;
+              peerNested.send(
                 JSON.stringify({
                   type: DataType.PLAYER_JOIN_LEFT,
                   join: true,
@@ -208,7 +212,6 @@ export const useAdminGame = (
 
     return () => {
       peers.forEach((peer) => {
-        peer.removeAllListeners('connect');
         peer.removeAllListeners('data');
       });
     };
@@ -219,6 +222,7 @@ export const useAdminGame = (
   useEffect(() => {
     const handlePlayerRemove = (id: string) => {
       peers.forEach((peer) => {
+        if (!peer || !peer.connected) return;
         peer.send(
           JSON.stringify({
             type: DataType.PLAYER_JOIN_LEFT,
@@ -228,7 +232,7 @@ export const useAdminGame = (
         );
       });
 
-      toast(`${game.players.get(id)?.name || ''} left the game`, {
+      toast(`${game.players.get(id)?.name || 'Player'} left the game`, {
         type: 'info',
       });
 
