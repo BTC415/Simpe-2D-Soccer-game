@@ -7,30 +7,32 @@ import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
 import Board from '@/modules/board';
 import GameInfo from '@/modules/gameInfo';
+import EnterName from '@/modules/joinlink';
 import { Toggler } from '@/modules/menu';
+import { useModal } from '@/modules/modal';
 
 const GamePage: NextPage = () => {
-  const { setAdmin, game } = useGame();
+  const { game } = useGame();
+  const { openModal } = useModal();
 
   const router = useRouter();
 
   useEffect(() => {
     const { gameId } = router.query;
-    if (gameId && !game.admin.id)
-      socket.emit('join_game', '', gameId.toString());
+    if (gameId && !game.admin.id) socket.emit('check_game', gameId.toString());
 
-    socket.on('game_joined', (_, id) => {
-      setAdmin({ id });
+    socket.on('game_found', () => {
+      openModal(<EnterName />, false);
     });
     socket.on('game_not_found', () => router.push('/'));
 
     return () => {
-      socket.off('game_joined');
+      socket.off('game_found');
       socket.off('game_not_found');
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [game.admin.id, router]);
 
   return (
     <div>

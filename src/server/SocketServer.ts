@@ -33,6 +33,7 @@ export class SocketServer {
     socket.on('join_game', (name, gameId) =>
       this.joinGame({ socketId: socket.id, name }, gameId)
     );
+    socket.on('check_game', (gameId) => this.checkGame(socket.id, gameId));
     socket.on('leave_game', () => this.leaveGame(socket.id));
     socket.on('disconnecting', () => this.leaveGame(socket.id));
 
@@ -88,6 +89,16 @@ export class SocketServer {
       if (gameAdmin !== socketId)
         this.io.to(gameAdmin).emit('player_joined', { id: socketId, name });
     }
+  }
+
+  private checkGame(socketId: string, gameId: string) {
+    const gameAdmin = this.getGameAdmin(gameId);
+    if (!gameAdmin) {
+      this.io.to(socketId).emit('game_not_found');
+      return;
+    }
+
+    this.io.to(socketId).emit('game_found');
   }
 
   private leaveGame(socketId: string) {
