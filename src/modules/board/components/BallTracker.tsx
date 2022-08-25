@@ -38,21 +38,29 @@ const BallTracker = ({ ballPosition }: { ballPosition: [number, number] }) => {
       let inViewportY = true;
 
       if (movableX) {
-        if (ballPosition[0] > position.x)
-          inViewportX =
-            position.x + windowWidth / 2 + BALL_SIZE > ballPosition[0];
-        else
-          inViewportX =
-            position.x - windowWidth / 2 - BALL_SIZE < ballPosition[0];
+        const nonVisibleArea =
+          (REAL_BOARD_SIZE.width - windowWidth) / 2 - Math.abs(camX);
+
+        if (
+          (camX > 0 &&
+            windowWidth + nonVisibleArea < ballPosition[0] - BALL_SIZE) ||
+          (camX < 0 &&
+            REAL_BOARD_SIZE.width - windowWidth - nonVisibleArea >
+              ballPosition[0] + BALL_SIZE)
+        )
+          inViewportX = false;
       }
 
       if (movableY) {
-        if (ballPosition[1] > position.y)
-          inViewportY =
-            position.y + windowHeight / 2 + BALL_SIZE > ballPosition[1];
-        else
-          inViewportY =
-            position.y - windowHeight / 2 - BALL_SIZE < ballPosition[1];
+        const nonVisibleArea = -camY;
+
+        if (
+          (position.y < ballPosition[1] &&
+            windowHeight + nonVisibleArea < ballPosition[1] - BALL_SIZE) ||
+          (position.y > ballPosition[1] &&
+            nonVisibleArea > ballPosition[1] + BALL_SIZE)
+        )
+          inViewportY = false;
       }
 
       const inViewport = inViewportX && inViewportY;
