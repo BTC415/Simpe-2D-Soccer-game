@@ -29,22 +29,32 @@ export const usePeersConnect = () => {
         initiator: false,
       });
 
-      const promise = new Promise((resolve) => {
+      const promise = new Promise((resolve, reject) => {
         peer.once('connect', () => resolve('resolve'));
+        peer.once('error', () => reject(Error));
       });
 
       const finalName = getName(id, { game, names }, name).name;
 
       const toastId = toast.loading(`${finalName} is connecting`);
 
-      promise.then(() =>
-        toast.update(toastId, {
-          render: `${finalName} joined the game`,
-          type: 'info',
-          isLoading: false,
-          autoClose: 5000,
-        })
-      );
+      promise
+        .then(() =>
+          toast.update(toastId, {
+            render: `${finalName} joined the game`,
+            type: 'info',
+            isLoading: false,
+            autoClose: 5000,
+          })
+        )
+        .catch(() => {
+          toast.update(toastId, {
+            render: `${finalName} has error in connecting`,
+            type: 'error',
+            isLoading: false,
+            autoClose: 5000,
+          });
+        });
 
       if (!peers.has(id)) setPeers((prev) => new Map(prev).set(id, peer));
       if (!names.has(id)) setNames((prev) => new Map(prev).set(id, finalName));
