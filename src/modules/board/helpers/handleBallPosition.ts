@@ -1,8 +1,16 @@
-import { BALL_SIZE, MOVE_BALL, PLAYER_SIZE } from '@/common/constants/settings';
+import {
+  BALL_SIZE,
+  MOVE_AREA_SIZE,
+  MOVE_BALL,
+  PLAYER_SIZE,
+  REAL_BOARD_SIZE,
+} from '@/common/constants/settings';
 import { Ball } from '@/common/types/ball.type';
 import { Player } from '@/common/types/player.type';
 
 import { makeBallPosition, makePosition } from './makePosition';
+
+const BALL_AREA = BALL_SIZE + MOVE_AREA_SIZE;
 
 export const handleBallPosition = (
   ball: Ball,
@@ -32,6 +40,18 @@ export const handleBallPosition = (
     position.x + velocityVector.x,
     position.y + velocityVector.y
   );
+
+  if (
+    newPosition.x === BALL_AREA ||
+    newPosition.x === REAL_BOARD_SIZE.width - BALL_AREA
+  )
+    newBall.velocityVector.x = velocityVector.x * -0.85;
+
+  if (
+    newPosition.y === BALL_AREA ||
+    newPosition.y === REAL_BOARD_SIZE.height - BALL_AREA
+  )
+    newBall.velocityVector.y = velocityVector.y * -0.85;
 
   const COLLISION_DISTANCE = PLAYER_SIZE + BALL_SIZE;
 
