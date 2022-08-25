@@ -15,21 +15,38 @@ export const useCamera = () => {
 
   let camX = 0;
   let camY = 0;
+  let windowWidth = 0;
+  let windowHeight = 0;
+  let movableX = false;
+  let movableY = false;
 
   if (typeof window !== 'undefined') {
     if (window.innerWidth < REAL_BOARD_SIZE.width) {
-      const boundyX = (REAL_BOARD_SIZE.width - window.innerWidth) / 2;
+      windowWidth = window.innerWidth;
+      movableX = window.innerWidth < REAL_BOARD_SIZE.width;
+      const boundyX = (REAL_BOARD_SIZE.width - windowWidth) / 2;
       camX = -clamp(x - REAL_BOARD_SIZE.width / 2, -boundyX, boundyX);
     }
 
     if (window.innerHeight < REAL_BOARD_SIZE.height) {
+      windowHeight = window.innerHeight;
+      movableY = window.innerHeight < REAL_BOARD_SIZE.height;
       camY = -clamp(
-        y - window.innerHeight / 2,
+        y - windowHeight / 2,
         -PLAYER_SIZE * 2,
-        REAL_BOARD_SIZE.height - window.innerHeight + PLAYER_SIZE * 2 + 28
+        REAL_BOARD_SIZE.height - windowHeight + PLAYER_SIZE * 2 + 28
       );
     }
   }
 
-  return { camX, camY, setPosition, position: { x, y } };
+  return {
+    camX,
+    camY,
+    setPosition,
+    position: { x, y },
+    windowHeight,
+    windowWidth,
+    movableX,
+    movableY,
+  };
 };

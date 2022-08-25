@@ -8,7 +8,7 @@ import { useModal } from '@/modules/modal';
 
 import { playerPositionContext } from '../context/playerPosition';
 import Background from './Background';
-import Players from './Players';
+import Movables from './Movables';
 
 const Board = () => {
   const { game, prevGame } = useGame();
@@ -67,7 +67,7 @@ const Board = () => {
       <playerPositionContext.Provider
         value={{ x: position.x, y: position.y, setPosition: handleSetPosition }}
       >
-        <Players />
+        <Movables />
         <Background />
       </playerPositionContext.Provider>
     </div>

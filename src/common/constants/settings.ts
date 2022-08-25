@@ -1,7 +1,6 @@
 export const BOARD_SIZE = {
   width: 1900,
   height: 1000,
-  rounded: 50,
 };
 
 export const PLAYER_SIZE = 30;

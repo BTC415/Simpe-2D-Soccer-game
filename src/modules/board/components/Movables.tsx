@@ -26,8 +26,9 @@ import { useCamera } from '../hooks/useCamera';
 import { useKeysDirection } from '../hooks/useKeysDirection';
 import { usePeersConnect } from '../hooks/usePeersConnect';
 import { useShoot } from '../hooks/useShoot';
+import BallTracker from './BallTracker';
 
-const Players = () => {
+const Movables = () => {
   const { setPosition, camX, camY, position } = useCamera();
   const { game, setGame } = useGame();
   const { admin } = game;
@@ -173,13 +174,16 @@ const Players = () => {
   }
 
   return (
-    <canvas
-      ref={ref}
-      width={REAL_BOARD_SIZE.width}
-      height={REAL_BOARD_SIZE.height}
-      className="absolute z-10"
-    />
+    <>
+      <BallTracker ballPosition={finalBallPosition} />
+      <canvas
+        ref={ref}
+        width={REAL_BOARD_SIZE.width}
+        height={REAL_BOARD_SIZE.height}
+        className="absolute z-10"
+      />
+    </>
   );
 };
 
-export default Players;
+export default Movables;
