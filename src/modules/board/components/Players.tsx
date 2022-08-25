@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'react-toastify';
 
-import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
+import {
+  BALL_SIZE,
+  PLAYER_SIZE,
+  REAL_BOARD_SIZE,
+} from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
 import { decoder } from '@/common/libs/decoder';
@@ -32,11 +36,17 @@ const Players = () => {
   const [playersPositions, setPlayersPositions] = useState<{
     [key: string]: [number, number];
   }>({});
+  const [ballPosition, setBallPosition] = useState<[number, number]>([
+    100, 100,
+  ]);
 
   const direction = useKeysDirection();
 
   const names = usePeersConnect();
-  const [adminPlayersPositions, adminPlayers] = useAdminGame(names, direction);
+  const [adminPlayersPositions, adminPlayers, adminBallPosition] = useAdminGame(
+    names,
+    direction
+  );
 
   useEffect(() => {
     if (admin.id !== socket.id) {
@@ -44,9 +54,11 @@ const Players = () => {
         adminPeer.on('data', (data: Uint8Array) => {
           const parsedData = JSON.parse(decoder.decode(data)) as Data;
 
-          if (parsedData.type === DataType.POSITIONS)
-            setPlayersPositions((parsedData as PositionData).positions);
-          else if (parsedData.type === DataType.GAME) {
+          if (parsedData.type === DataType.POSITIONS) {
+            const dataTyped = parsedData as PositionData;
+            setPlayersPositions(dataTyped.positions);
+            setBallPosition(dataTyped.ballPosition);
+          } else if (parsedData.type === DataType.GAME) {
             const gameFromAdmin = (parsedData as GameData).game;
             setGame({
               ...gameFromAdmin,
@@ -79,8 +91,9 @@ const Players = () => {
 
   const finalPlayersPositions =
     admin.id === socket.id ? adminPlayersPositions : playersPositions;
-
   const finalPlayers = admin.id === socket.id ? adminPlayers : game.players;
+  const finalBallPosition =
+    admin.id === socket.id ? adminBallPosition : ballPosition;
 
   useEffect(() => {
     const myPosition = finalPlayersPositions[socket.id];
@@ -110,6 +123,19 @@ const Players = () => {
       ctx.strokeStyle = '#000';
       ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
       ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff';
+
+      ctx.beginPath();
+      ctx.arc(
+        finalBallPosition[0],
+        finalBallPosition[1],
+        BALL_SIZE,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      ctx.stroke();
+      ctx.closePath();
 
       finalPlayers.forEach(({ team }, id) => {
         if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;

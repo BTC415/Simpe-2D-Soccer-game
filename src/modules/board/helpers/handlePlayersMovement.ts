@@ -4,7 +4,8 @@ import { Player, PlayerTeam } from '@/common/types/player.type';
 import { makePosition } from './makePosition';
 
 export const handlePlayersMovement = (
-  players: Map<string, Player>
+  players: Map<string, Player>,
+  reverse: boolean
 ): Map<string, Player> => {
   const newPlayers = new Map(players);
 
@@ -50,7 +51,10 @@ export const handlePlayersMovement = (
       position.y + velocityVector.y
     );
 
-    newPlayers.forEach((playerCollision, playerCollisionId) => {
+    const playersArr = [...newPlayers];
+    if (reverse) playersArr.reverse();
+
+    playersArr.forEach(([playerCollisionId, playerCollision]) => {
       if (id === playerCollisionId) return;
 
       const distanceX = newPosition.x - playerCollision.position.x;

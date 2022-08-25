@@ -8,6 +8,7 @@ import {
 
 import type SimplePeer from 'simple-peer';
 
+import { REAL_BOARD_SIZE } from '../constants/settings';
 import { Game, StatusPeer } from '../types/game.type';
 
 export const DEFAULT_GAME: Game = {
@@ -21,6 +22,10 @@ export const DEFAULT_GAME: Game = {
   players: new Map(),
   paused: false,
   started: false,
+  ball: {
+    position: { x: REAL_BOARD_SIZE.width / 2, y: REAL_BOARD_SIZE.height / 2 },
+    velocityVector: { x: 0, y: 0 },
+  },
 };
 
 const gameContext = createContext<{

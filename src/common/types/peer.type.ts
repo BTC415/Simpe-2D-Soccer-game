@@ -19,6 +19,7 @@ export type PositionData = {
   positions: {
     [key: string]: [number, number];
   };
+  ballPosition: [number, number];
 };
 
 export type PlayerJoinLeftData = {

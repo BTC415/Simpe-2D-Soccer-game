@@ -6,6 +6,8 @@ export const BOARD_SIZE = {
 
 export const PLAYER_SIZE = 30;
 
+export const BALL_SIZE = 23;
+
 export const MOVE_AREA_SIZE = PLAYER_SIZE * 2;
 
 export const REAL_BOARD_SIZE = {
@@ -19,4 +21,10 @@ export const MOVE = {
   MAX_SPEED: 2.5,
   ACCELERATION: 0.2,
   DECELERATION: 0.05,
+};
+
+export const MOVE_BALL = {
+  MAX_SPEED: 5,
+  ACCELERATION: 0.5,
+  DECELERATION: 0.013,
 };

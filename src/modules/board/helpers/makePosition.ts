@@ -1,4 +1,9 @@
-import { PLAYER_SIZE, REAL_BOARD_SIZE } from '@/common/constants/settings';
+import {
+  BALL_SIZE,
+  MOVE_AREA_SIZE,
+  PLAYER_SIZE,
+  REAL_BOARD_SIZE,
+} from '@/common/constants/settings';
 
 export const makePosition = (x: number, y: number) => {
   const newX = Math.max(
@@ -8,6 +13,19 @@ export const makePosition = (x: number, y: number) => {
   const newY = Math.max(
     Math.min(y, REAL_BOARD_SIZE.height - PLAYER_SIZE),
     PLAYER_SIZE
+  );
+
+  return { x: Math.round(newX * 10) / 10, y: Math.round(newY * 10) / 10 };
+};
+
+export const makeBallPosition = (x: number, y: number) => {
+  const newX = Math.max(
+    Math.min(x, REAL_BOARD_SIZE.width - BALL_SIZE - MOVE_AREA_SIZE),
+    BALL_SIZE + MOVE_AREA_SIZE
+  );
+  const newY = Math.max(
+    Math.min(y, REAL_BOARD_SIZE.height - BALL_SIZE - MOVE_AREA_SIZE),
+    BALL_SIZE + MOVE_AREA_SIZE
   );
 
   return { x: Math.round(newX * 10) / 10, y: Math.round(newY * 10) / 10 };

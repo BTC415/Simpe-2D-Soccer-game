@@ -79,7 +79,7 @@ const Menu = () => {
         {!game.started && socket.id === game.admin.id && (
           <button
             className="btn w-40 bg-green-500 from-green-500"
-            onClick={() => startGame(300)}
+            onClick={() => startGame(30000)}
           >
             <BsFillPlayFill />
             Start game

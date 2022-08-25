@@ -8,6 +8,7 @@ import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
 import { decoder } from '@/common/libs/decoder';
 import { socket } from '@/common/libs/socket';
+import { Ball } from '@/common/types/ball.type';
 import {
   Data,
   DataType,
@@ -20,7 +21,7 @@ import {
 import { Direction, Player, PlayerTeam } from '@/common/types/player.type';
 
 import { getName } from '../helpers/getName';
-import { handlePlayersMovement } from '../helpers/handlePlayersMovement';
+import { handleAllPhysics } from '../helpers/handleAllPhysics';
 
 const makeEasyPositions = (players: Map<string, Player>) => {
   const easyPositions: { [key: string]: [number, number] } = {};
@@ -39,7 +40,8 @@ export const useAdminGame = (
   {
     [key: string]: [number, number];
   },
-  Map<string, Player>
+  Map<string, Player>,
+  [number, number]
 ] => {
   const {
     game,
@@ -58,16 +60,32 @@ export const useAdminGame = (
     new Map()
   );
 
+  const ball = useRef<Ball>({
+    position: { x: 300, y: 300 },
+    velocityVector: { x: 0, y: 0 },
+  });
+  const [ballState, setBallState] = useState<Ball>({
+    position: { x: 0, y: 0 },
+    velocityVector: { x: 0, y: 0 },
+  });
+
   const { gameId } = useRouter().query;
 
   useEffect(() => {
     let gameplay: NodeJS.Timeout;
+    let reverse = false;
 
     if (socket.id === admin.id) {
       gameplay = setInterval(() => {
         if (!game.paused && game.started) {
-          players.current = handlePlayersMovement(players.current);
+          [ball.current, players.current] = handleAllPhysics(
+            { ball: ball.current, players: players.current },
+            reverse
+          );
           setPlayersState(players.current);
+          setBallState(ball.current);
+
+          reverse = !reverse;
         }
 
         peers.forEach((peer) => {
@@ -76,6 +94,10 @@ export const useAdminGame = (
               JSON.stringify({
                 type: DataType.POSITIONS,
                 positions: makeEasyPositions(players.current),
+                ballPosition: [
+                  ball.current.position.x,
+                  ball.current.position.y,
+                ],
               } as PositionData)
             );
         });
@@ -260,5 +282,9 @@ export const useAdminGame = (
     };
   }, [game.players, peers, removePlayer]);
 
-  return [makeEasyPositions(playersState), playersState];
+  return [
+    makeEasyPositions(playersState),
+    playersState,
+    [ballState.position.x, ballState.position.y],
+  ];
 };

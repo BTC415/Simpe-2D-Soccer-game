@@ -1,3 +1,4 @@
+import { Ball } from './ball.type';
 import { Player } from './player.type';
 
 export type Game = {
@@ -11,6 +12,7 @@ export type Game = {
   players: Map<string, Player>;
   paused: boolean;
   started: boolean;
+  ball: Ball;
 };
 
 export enum StatusPeer {
