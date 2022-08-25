@@ -6,6 +6,7 @@ import {
   BALL_SIZE,
   PLAYER_SIZE,
   REAL_BOARD_SIZE,
+  SHOOT_DISTANCE,
 } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
@@ -24,6 +25,7 @@ import { useAdminGame } from '../hooks/useAdminGame';
 import { useCamera } from '../hooks/useCamera';
 import { useKeysDirection } from '../hooks/useKeysDirection';
 import { usePeersConnect } from '../hooks/usePeersConnect';
+import { useShoot } from '../hooks/useShoot';
 
 const Players = () => {
   const { setPosition, camX, camY, position } = useCamera();
@@ -34,18 +36,19 @@ const Players = () => {
   const ref = useRef<HTMLCanvasElement>(null);
 
   const [playersPositions, setPlayersPositions] = useState<{
-    [key: string]: [number, number];
+    [key: string]: [number, number, number];
   }>({});
   const [ballPosition, setBallPosition] = useState<[number, number]>([
     100, 100,
   ]);
 
   const direction = useKeysDirection();
+  const shoot = useShoot();
 
   const names = usePeersConnect();
   const [adminPlayersPositions, adminPlayers, adminBallPosition] = useAdminGame(
     names,
-    direction
+    { direction, shoot }
   );
 
   useEffect(() => {
@@ -120,7 +123,6 @@ const Players = () => {
       ctx.translate(camX, camY);
 
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#000';
       ctx.font = `bold ${PLAYER_SIZE / 1.9}px Montserrat`;
       ctx.textAlign = 'center';
       ctx.fillStyle = '#fff';
@@ -139,18 +141,28 @@ const Players = () => {
 
       finalPlayers.forEach(({ team }, id) => {
         if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;
-        const [x, y] = finalPlayersPositions[id];
+        const [x, y, isShooting] = finalPlayersPositions[id];
 
         ctx.fillStyle = team === PlayerTeam.BLUE ? '#3b82f6' : '#ef4444';
+        ctx.strokeStyle = '#000';
 
         ctx.beginPath();
         ctx.arc(x, y, PLAYER_SIZE, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
+
+        if (isShooting) {
+          ctx.strokeStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(x, y, PLAYER_SIZE + SHOOT_DISTANCE, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.closePath();
+        }
       });
 
       ctx.fillStyle = '#fff';
+      ctx.strokeStyle = '#000';
       finalPlayers.forEach(({ name, team }, id) => {
         if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;
         const [x, y] = finalPlayersPositions[id];

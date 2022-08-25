@@ -17,7 +17,7 @@ export type Data = {
 export type PositionData = {
   type: DataType.POSITIONS;
   positions: {
-    [key: string]: [number, number];
+    [key: string]: [number, number, /* SHOOTING */ number];
   };
   ballPosition: [number, number];
 };

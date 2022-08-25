@@ -24,10 +24,10 @@ import { getName } from '../helpers/getName';
 import { handleAllPhysics } from '../helpers/handleAllPhysics';
 
 const makeEasyPositions = (players: Map<string, Player>) => {
-  const easyPositions: { [key: string]: [number, number] } = {};
+  const easyPositions: { [key: string]: [number, number, number] } = {};
 
-  players.forEach(({ position }, id) => {
-    easyPositions[id] = [position.x, position.y];
+  players.forEach(({ position, shoot }, id) => {
+    easyPositions[id] = [position.x, position.y, shoot ? 1 : 0];
   });
 
   return easyPositions;
@@ -35,10 +35,10 @@ const makeEasyPositions = (players: Map<string, Player>) => {
 
 export const useAdminGame = (
   names: Map<string, string>,
-  direction: Direction
+  { direction, shoot }: { direction: Direction; shoot: boolean }
 ): [
   {
-    [key: string]: [number, number];
+    [key: string]: [number, number, number];
   },
   Map<string, Player>,
   [number, number]
@@ -163,12 +163,14 @@ export const useAdminGame = (
   }, [game, peers]);
 
   useEffect(() => {
-    if (players.current.has(admin.id))
+    if (players.current.has(admin.id)) {
       players.current.set(admin.id, {
         ...players.current.get(admin.id)!,
         direction,
+        shoot,
       });
-  }, [admin.id, direction]);
+    }
+  }, [admin.id, direction, shoot]);
 
   useEffect(() => {
     if (admin.id === socket.id && !players.current.has(admin.id)) {
@@ -185,6 +187,7 @@ export const useAdminGame = (
         },
         team: PlayerTeam.SPECTATOR,
         direction: { x: 0, y: 0 },
+        shoot: false,
       });
       setAdmin({ id: admin.id, name: admin.name || 'Player 1' });
     }
@@ -222,6 +225,7 @@ export const useAdminGame = (
               },
               team: PlayerTeam.SPECTATOR,
               direction: { x: 0, y: 0 },
+              shoot: false,
             });
 
             setPlayersState(players.current);
@@ -240,7 +244,10 @@ export const useAdminGame = (
               direction: newDirection,
             });
           } else if (parsedData.type === DataType.SHOOT) {
-            // TODO: handle shoot
+            players.current.set(id, {
+              ...players.current.get(id)!,
+              shoot: !players.current.get(id)!.shoot,
+            });
           } else if (parsedData.type === DataType.TEAM_CHANGE)
             setPlayerTeam(id, (parsedData as TeamChangeData).team);
         });

@@ -18,5 +18,6 @@ export interface Player {
   position: { x: number; y: number };
   direction: Direction;
   velocityVector: { x: number; y: number };
+  shoot: boolean;
   // score: number;
 }

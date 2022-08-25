@@ -4,6 +4,7 @@ import {
   MOVE_BALL,
   PLAYER_SIZE,
   REAL_BOARD_SIZE,
+  SHOOT_DISTANCE,
 } from '@/common/constants/settings';
 import { Ball } from '@/common/types/ball.type';
 import { Player } from '@/common/types/player.type';
@@ -63,7 +64,18 @@ export const handleBallPosition = (
     const distanceY = newPosition.y - playerCollision.position.y;
     const length = Math.sqrt(distanceX ** 2 + distanceY ** 2) || 1;
 
-    if (length < COLLISION_DISTANCE + 1) {
+    if (
+      playerCollision.shoot &&
+      length < COLLISION_DISTANCE + SHOOT_DISTANCE + 1
+    ) {
+      const unitX = distanceX / length;
+      const unitY = distanceY / length;
+
+      newBall.velocityVector = {
+        x: unitX * 5,
+        y: unitY * 5,
+      };
+    } else if (length < COLLISION_DISTANCE + 1) {
       const unitX = distanceX / length;
       const unitY = distanceY / length;
 
