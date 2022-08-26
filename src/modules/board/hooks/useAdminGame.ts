@@ -164,7 +164,6 @@ export const useAdminGame = (
   }, [admin.id, game, prevGame.admin.id, setGame]);
 
   useEffect(() => {
-    console.log(123);
     players.current = game.players;
     setPlayersState(game.players);
     ball.current = game.ball;
