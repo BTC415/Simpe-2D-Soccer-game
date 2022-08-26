@@ -1,19 +1,26 @@
 export const BOARD_SIZE = {
-  width: 1900,
-  height: 1000,
+  width: 1700,
+  height: 900,
 };
 
 export const PLAYER_SIZE = 30;
+
+export const LINE_WIDTH = 4;
 
 export const SHOOT_DISTANCE = 7;
 
 export const BALL_SIZE = 23;
 
-export const MOVE_AREA_SIZE = PLAYER_SIZE * 2;
+export const MOVE_AREA_SIZE = PLAYER_SIZE * 2 + 5;
 
 export const REAL_BOARD_SIZE = {
   width: BOARD_SIZE.width + MOVE_AREA_SIZE * 2,
   height: BOARD_SIZE.height + MOVE_AREA_SIZE * 2,
+};
+
+export const GOAL_POSITION = {
+  fromLeft: 2,
+  height: 125,
 };
 
 export const TICKRATE = 64;

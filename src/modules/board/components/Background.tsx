@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import {
   BOARD_SIZE,
+  GOAL_POSITION,
   MOVE_AREA_SIZE,
   REAL_BOARD_SIZE,
 } from '@/common/constants/settings';
@@ -72,6 +73,86 @@ const Background = () => {
           BOARD_SIZE.width,
           BOARD_SIZE.height
         );
+
+        // GOALS
+        ctx.beginPath();
+
+        // LEFT GOAL
+        ctx.moveTo(GOAL_POSITION.fromLeft, REAL_BOARD_SIZE.height / 2);
+        ctx.lineTo(
+          GOAL_POSITION.fromLeft,
+          REAL_BOARD_SIZE.height / 2 - GOAL_POSITION.height
+        );
+        ctx.lineTo(
+          GOAL_POSITION.fromLeft + MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 - GOAL_POSITION.height
+        );
+
+        ctx.moveTo(GOAL_POSITION.fromLeft, REAL_BOARD_SIZE.height / 2);
+        ctx.lineTo(
+          GOAL_POSITION.fromLeft,
+          REAL_BOARD_SIZE.height / 2 + GOAL_POSITION.height
+        );
+        ctx.lineTo(
+          GOAL_POSITION.fromLeft + MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 + GOAL_POSITION.height
+        );
+
+        // RIGHT GOAL
+        ctx.moveTo(
+          REAL_BOARD_SIZE.width - GOAL_POSITION.fromLeft,
+          REAL_BOARD_SIZE.height / 2
+        );
+        ctx.lineTo(
+          REAL_BOARD_SIZE.width - GOAL_POSITION.fromLeft,
+          REAL_BOARD_SIZE.height / 2 - GOAL_POSITION.height
+        );
+        ctx.lineTo(
+          REAL_BOARD_SIZE.width - GOAL_POSITION.fromLeft - MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 - GOAL_POSITION.height
+        );
+
+        ctx.moveTo(
+          REAL_BOARD_SIZE.width - GOAL_POSITION.fromLeft,
+          REAL_BOARD_SIZE.height / 2
+        );
+        ctx.lineTo(
+          REAL_BOARD_SIZE.width - GOAL_POSITION.fromLeft,
+          REAL_BOARD_SIZE.height / 2 + GOAL_POSITION.height
+        );
+        ctx.lineTo(
+          REAL_BOARD_SIZE.width - GOAL_POSITION.fromLeft - MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 + GOAL_POSITION.height
+        );
+
+        ctx.stroke();
+        ctx.closePath();
+
+        // REMOVE WHITE LINES
+        ctx.beginPath();
+        ctx.strokeStyle = '#5A9D61';
+
+        ctx.moveTo(
+          MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 - GOAL_POSITION.height + 2
+        );
+        ctx.lineTo(
+          MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 + GOAL_POSITION.height - 2
+        );
+
+        ctx.moveTo(
+          REAL_BOARD_SIZE.width - MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 - GOAL_POSITION.height + 2
+        );
+        ctx.lineTo(
+          REAL_BOARD_SIZE.width - MOVE_AREA_SIZE,
+          REAL_BOARD_SIZE.height / 2 + GOAL_POSITION.height - 2
+        );
+
+        ctx.stroke();
+
+        ctx.closePath();
       }
     }
   }, [camX, camY]);
