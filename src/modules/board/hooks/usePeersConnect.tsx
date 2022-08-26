@@ -36,6 +36,7 @@ export const usePeersConnect = () => {
       const promise = new Promise((resolve, reject) => {
         peer.once('connect', () => resolve('resolve'));
         peer.once('error', (err) => {
+          // eslint-disable-next-line no-console
           console.log(err);
           reject(err);
         });
