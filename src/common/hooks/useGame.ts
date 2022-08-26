@@ -22,7 +22,7 @@ export const useGame = () => {
       const player = prev.players.get(playerId);
       if (!player) return prev;
 
-      const newPlayers = prev.players;
+      const newPlayers = new Map(prev.players);
       const position = { x: 0, y: REAL_BOARD_SIZE.height / 2 };
 
       if (team === PlayerTeam.BLUE) {
