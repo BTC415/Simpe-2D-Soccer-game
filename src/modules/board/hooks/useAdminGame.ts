@@ -16,6 +16,7 @@ import {
   GameData,
   PlayerJoinLeftData,
   PositionData,
+  ShootData,
   TeamChangeData,
 } from '@/common/types/peer.type';
 import { Direction, Player, PlayerTeam } from '@/common/types/player.type';
@@ -246,7 +247,7 @@ export const useAdminGame = (
           } else if (parsedData.type === DataType.SHOOT) {
             players.current.set(id, {
               ...players.current.get(id)!,
-              shoot: !players.current.get(id)!.shoot,
+              shoot: (parsedData as ShootData).shoot,
             });
           } else if (parsedData.type === DataType.TEAM_CHANGE)
             setPlayerTeam(id, (parsedData as TeamChangeData).team);

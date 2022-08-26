@@ -40,6 +40,7 @@ export type DirectionData = {
 
 export type ShootData = {
   type: DataType.SHOOT;
+  shoot: boolean;
 };
 
 export type TeamChangeData = {

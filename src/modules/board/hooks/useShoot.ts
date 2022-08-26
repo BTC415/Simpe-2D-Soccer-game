@@ -40,6 +40,7 @@ export const useShoot = () => {
         adminPeer.send(
           JSON.stringify({
             type: DataType.SHOOT,
+            shoot,
           } as ShootData)
         );
       }
