@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 
 import { PLAYER_SIZE, REAL_BOARD_SIZE } from '../constants/settings';
 import { gameContext } from '../context/gameContext';
@@ -7,6 +7,8 @@ import { Player, PlayerTeam } from '../types/player.type';
 export const useGame = () => {
   const { game, setGame, setStatus, status, prevGame } =
     useContext(gameContext);
+
+  const addedScore = useRef(false);
 
   const setAdmin = (newAdmin: { id: string; name?: string }) => {
     setGame((prev) => ({
@@ -71,6 +73,35 @@ export const useGame = () => {
     setGame((prev) => ({ ...prev, secondsLeft: seconds, started: true }));
   };
 
+  const addScore = (team: PlayerTeam) => {
+    if (!addedScore.current) {
+      addedScore.current = true;
+      setGame((prev) => {
+        let blueScore = prev.scores[0];
+        let redScore = prev.scores[1];
+
+        if (team === PlayerTeam.BLUE) blueScore += 1;
+        else if (team === PlayerTeam.RED) redScore += 1;
+
+        return { ...prev, scores: [blueScore, redScore] };
+      });
+
+      setTimeout(() => {
+        addedScore.current = false;
+        setGame((prev) => ({
+          ...prev,
+          ball: {
+            velocityVector: { x: 0, y: 0 },
+            position: {
+              x: REAL_BOARD_SIZE.width / 2,
+              y: REAL_BOARD_SIZE.height / 2,
+            },
+          },
+        }));
+      }, 3000);
+    }
+  };
+
   return {
     game,
     prevGame,
@@ -82,5 +113,6 @@ export const useGame = () => {
     removePlayer,
     stopGame,
     startGame,
+    addScore,
   };
 };

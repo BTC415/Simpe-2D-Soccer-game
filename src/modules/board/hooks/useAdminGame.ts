@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 
-import { REAL_BOARD_SIZE, TICKRATE } from '@/common/constants/settings';
+import {
+  BALL_SIZE,
+  MOVE_AREA_SIZE,
+  REAL_BOARD_SIZE,
+  TICKRATE,
+} from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
 import { decoder } from '@/common/libs/decoder';
@@ -52,6 +57,7 @@ export const useAdminGame = (
     setPlayerTeam,
     setAdmin,
     stopGame,
+    addScore,
   } = useGame();
   const { admin } = game;
   const { peers } = usePeers();
@@ -87,6 +93,14 @@ export const useAdminGame = (
           setBallState(ball.current);
 
           reverse = !reverse;
+
+          if (ball.current.position.x + BALL_SIZE < MOVE_AREA_SIZE)
+            addScore(PlayerTeam.RED);
+          else if (
+            ball.current.position.x - BALL_SIZE >
+            REAL_BOARD_SIZE.width - MOVE_AREA_SIZE
+          )
+            addScore(PlayerTeam.BLUE);
         }
 
         peers.forEach((peer) => {
@@ -108,6 +122,8 @@ export const useAdminGame = (
     return () => {
       clearInterval(gameplay);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [admin.id, game, gameId, peers, setGame]);
 
   useEffect(() => {
@@ -141,6 +157,8 @@ export const useAdminGame = (
       game.players.delete(prevGame.admin.id);
       players.current = game.players;
       setPlayersState(players.current);
+      ball.current = game.ball;
+      setBallState(game.ball);
       setGame(game);
     }
   }, [admin.id, game, prevGame.admin.id, setGame]);
@@ -148,7 +166,11 @@ export const useAdminGame = (
   useEffect(() => {
     players.current = game.players;
     setPlayersState(game.players);
+    ball.current = game.ball;
+    setBallState(game.ball);
+  }, [game.players, game.ball]);
 
+  useEffect(() => {
     peers.forEach((peer) => {
       if (peer.connected)
         peer.send(
