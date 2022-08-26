@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Peer from 'simple-peer';
 
+import { ICE_SERVERS } from '@/common/constants/iceServers';
 import { DEFAULT_GAME } from '@/common/context/gameContext';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
@@ -27,11 +28,17 @@ export const usePeersConnect = () => {
     socket.on('player_joined', ({ name, id }) => {
       const peer = new Peer({
         initiator: false,
+        config: {
+          iceServers: ICE_SERVERS,
+        },
       });
 
       const promise = new Promise((resolve, reject) => {
         peer.once('connect', () => resolve('resolve'));
-        peer.once('error', () => reject(Error));
+        peer.once('error', (err) => {
+          console.log(err);
+          reject(err);
+        });
       });
 
       const finalName = getName(id, { game, names }, name).name;
@@ -88,6 +95,9 @@ export const usePeersConnect = () => {
         game.players.forEach(({ name }, id) => {
           const peer = new Peer({
             initiator: false,
+            config: {
+              iceServers: ICE_SERVERS,
+            },
           });
 
           peer.once('connect', () =>
@@ -141,6 +151,9 @@ export const usePeersConnect = () => {
     if (admin.id && admin.id !== socket.id && !peers.has(admin.id)) {
       const peer = new Peer({
         initiator: true,
+        config: {
+          iceServers: ICE_SERVERS,
+        },
       });
 
       peer.once('error', () => setStatus(StatusPeer.ERROR));
