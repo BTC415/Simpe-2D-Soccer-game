@@ -32,6 +32,7 @@ export const useGame = () => {
           y: redMaxTop - index * 100,
         },
         direction: { x: 0, y: 0 },
+        velocityVector: { x: 0, y: 0 },
       });
     });
 
@@ -48,6 +49,7 @@ export const useGame = () => {
           y: blueMaxTop - index * 100,
         },
         direction: { x: 0, y: 0 },
+        velocityVector: { x: 0, y: 0 },
       });
     });
 
@@ -62,6 +64,7 @@ export const useGame = () => {
           y: REAL_BOARD_SIZE.height / 2,
         },
         direction: { x: 0, y: 0 },
+        velocityVector: { x: 0, y: 0 },
       });
     });
 
@@ -120,12 +123,45 @@ export const useGame = () => {
         secondsLeft: 300,
         scores: [0, 0],
         started: false,
+        results: false,
+      };
+    });
+  };
+
+  const endGame = () => {
+    setGame((prev) => {
+      const newPlayers: Map<string, Player> = new Map();
+
+      prev.players.forEach((player, id) => {
+        newPlayers.set(id, {
+          ...player,
+          team: PlayerTeam.SPECTATOR,
+          position: { x: -100, y: REAL_BOARD_SIZE.height / 2 },
+        });
+      });
+
+      return {
+        ...prev,
+        players: newPlayers,
+        secondsLeft: 300,
+        results: true,
       };
     });
   };
 
   const startGame = (seconds: number) => {
-    setGame((prev) => ({ ...prev, secondsLeft: seconds, started: true }));
+    setGame((prev) => ({
+      ...prev,
+      secondsLeft: seconds,
+      started: true,
+      ball: {
+        position: {
+          x: REAL_BOARD_SIZE.width / 2,
+          y: REAL_BOARD_SIZE.height / 2,
+        },
+        velocityVector: { x: 0, y: 0 },
+      },
+    }));
   };
 
   const addScore = (team: PlayerTeam) => {
@@ -171,5 +207,6 @@ export const useGame = () => {
     stopGame,
     startGame,
     addScore,
+    endGame,
   };
 };

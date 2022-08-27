@@ -56,7 +56,7 @@ export const useAdminGame = (
     removePlayer,
     setPlayerTeam,
     setAdmin,
-    stopGame,
+    endGame,
     addScore,
   } = useGame();
   const { admin } = game;
@@ -84,7 +84,7 @@ export const useAdminGame = (
 
     if (socket.id === admin.id) {
       gameplay = setInterval(() => {
-        if (!game.paused && game.started) {
+        if (!game.paused && game.started && !game.results) {
           [ball.current, players.current] = handleAllPhysics(
             { ball: ball.current, players: players.current },
             reverse
@@ -128,7 +128,7 @@ export const useAdminGame = (
 
   useEffect(() => {
     let updateGame: NodeJS.Timeout;
-    if (socket.id === admin.id && game.started)
+    if (socket.id === admin.id && game.started && !game.results)
       updateGame = setInterval(() => {
         setGame((prev) => ({
           ...prev,
@@ -141,9 +141,9 @@ export const useAdminGame = (
     return () => {
       clearInterval(updateGame);
     };
-  }, [admin.id, gameId, setGame, game.started]);
+  }, [admin.id, gameId, setGame, game.started, game.results]);
   useEffect(() => {
-    if (game.secondsLeft < 0) stopGame();
+    if (game.secondsLeft < 0) endGame();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.secondsLeft]);

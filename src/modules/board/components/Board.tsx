@@ -5,6 +5,7 @@ import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
 import Menu from '@/modules/menu';
 import { useModal } from '@/modules/modal';
+import Results from '@/modules/results';
 
 import { playerPositionContext } from '../context/playerPosition';
 import Background from './Background';
@@ -47,10 +48,11 @@ const Board = () => {
 
   useEffect(() => {
     if (!game.started) openModal(<Menu />, false);
+    else if (game.results) openModal(<Results />, false);
     else if (!prevGame.started && game.started) closeModal();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.started, prevGame.started]);
+  }, [game.started, prevGame.started, game.results]);
 
   return (
     <div

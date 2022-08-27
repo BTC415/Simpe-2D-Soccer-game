@@ -13,6 +13,7 @@ export type Game = {
   paused: boolean;
   started: boolean;
   ball: Ball;
+  results: boolean;
 };
 
 export enum StatusPeer {
