@@ -34,7 +34,7 @@ const Team = ({ team }: { team: PlayerTeam }) => {
   };
 
   return (
-    <div className="flex h-96 w-72 flex-col gap-3">
+    <div className="flex h-72 w-full flex-col gap-3 lg:h-96 lg:w-72">
       <button
         onClick={handleTeamChange}
         disabled={game.started && game.admin.id !== socket.id}

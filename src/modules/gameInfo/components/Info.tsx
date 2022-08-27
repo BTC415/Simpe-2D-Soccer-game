@@ -14,18 +14,22 @@ const Info = () => {
       className="absolute z-30 flex w-full items-center bg-black/40 backdrop-blur-sm"
       style={{ height: PLAYER_SIZE * 2 }}
     >
-      <div className="flex w-full items-center justify-center gap-72 text-3xl">
+      <div className="flex w-full items-center justify-center gap-28 text-2xl lg:text-3xl xl:gap-72">
         <p className="font-black text-blue-500">BLUE TEAM</p>
 
-        <div className="flex w-72 items-center justify-center gap-10">
-          <p className="text-5xl font-black text-blue-500">{scores[0]}</p>
-          <p className="font-black">
+        <div className="flex items-center justify-center gap-3 lg:gap-10">
+          <p className="text-4xl font-black text-blue-500 lg:text-5xl">
+            {scores[0]}
+          </p>
+          <p className="w-24 text-center text-2xl font-black">
             {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
           </p>
-          <p className="text-5xl font-black text-red-500">{scores[1]}</p>
+          <p className="text-4xl font-black text-red-500 lg:text-5xl">
+            {scores[1]}
+          </p>
         </div>
 
-        <p className="text-3xl font-black text-red-500">RED TEAM</p>
+        <p className="text-2xl font-black text-red-500 lg:text-3xl">RED TEAM</p>
       </div>
     </div>
   );
