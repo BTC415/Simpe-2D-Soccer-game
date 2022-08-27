@@ -92,7 +92,7 @@ const BallTracker = ({ ballPosition }: { ballPosition: [number, number] }) => {
       ref={ref}
       width={REAL_BOARD_SIZE.width}
       height={REAL_BOARD_SIZE.height}
-      className="absolute z-20"
+      className="absolute z-10"
     />
   );
 };
