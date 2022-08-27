@@ -9,6 +9,7 @@ import { useModal } from '@/modules/modal';
 import { playerPositionContext } from '../context/playerPosition';
 import Background from './Background';
 import Movables from './Movables';
+import ScoreSignal from './ScoreSignal';
 
 const Board = () => {
   const { game, prevGame } = useGame();
@@ -64,6 +65,9 @@ const Board = () => {
           {!game.started && <p className="text-6xl">WAITING FOR START</p>}
         </div>
       )}
+
+      <ScoreSignal />
+
       <playerPositionContext.Provider
         value={{ x: position.x, y: position.y, setPosition: handleSetPosition }}
       >

@@ -17,45 +17,78 @@ export const useGame = () => {
     }));
   };
 
+  const resetPositions = (players: Map<string, Player>) => {
+    const newPlayers = new Map(players);
+
+    const redPlayers = [...players].filter(
+      ([_, playerArr]) => playerArr.team === PlayerTeam.RED
+    );
+    const redMaxTop = 50 * (redPlayers.length - 1) + REAL_BOARD_SIZE.height / 2;
+    redPlayers.forEach(([playerId, player], index) => {
+      newPlayers.set(playerId, {
+        ...player,
+        position: {
+          x: REAL_BOARD_SIZE.width - 300,
+          y: redMaxTop - index * 100,
+        },
+        direction: { x: 0, y: 0 },
+      });
+    });
+
+    const bluePlayers = [...players].filter(
+      ([_, playerArr]) => playerArr.team === PlayerTeam.BLUE
+    );
+    const blueMaxTop =
+      50 * (bluePlayers.length - 1) + REAL_BOARD_SIZE.height / 2;
+    bluePlayers.forEach(([playerId, player], index) => {
+      newPlayers.set(playerId, {
+        ...player,
+        position: {
+          x: 300,
+          y: blueMaxTop - index * 100,
+        },
+        direction: { x: 0, y: 0 },
+      });
+    });
+
+    const spectators = [...players].filter(
+      ([_, playerArr]) => playerArr.team === PlayerTeam.SPECTATOR
+    );
+    spectators.forEach(([playerId, player]) => {
+      newPlayers.set(playerId, {
+        ...player,
+        position: {
+          x: -100,
+          y: REAL_BOARD_SIZE.height / 2,
+        },
+        direction: { x: 0, y: 0 },
+      });
+    });
+
+    return newPlayers;
+  };
+
   const setPlayerTeam = (playerId: string, team: PlayerTeam) => {
     setGame((prev) => {
       const player = prev.players.get(playerId);
       if (!player) return prev;
 
-      const newPlayers = new Map(prev.players);
+      let newPlayers = new Map(prev.players);
 
       const position = { x: 0, y: REAL_BOARD_SIZE.height / 2 };
 
-      if (team === PlayerTeam.SPECTATOR) {
-        position.x = -100;
-      } else if (game.started) {
-        if (team === PlayerTeam.BLUE) {
-          position.x = PLAYER_SIZE + 10;
-        } else if (team === PlayerTeam.RED) {
+      if (game.started) {
+        if (team === PlayerTeam.BLUE) position.x = PLAYER_SIZE + 10;
+        else if (team === PlayerTeam.RED)
           position.x = REAL_BOARD_SIZE.width - PLAYER_SIZE - 10;
-        }
-      } else {
-        position.x =
-          team === PlayerTeam.BLUE ? 300 : REAL_BOARD_SIZE.width - 300;
+        if (team === PlayerTeam.SPECTATOR) position.x = -100;
 
-        const teamPlayers = new Map(
-          [...prev.players].filter(([_, playerArr]) => playerArr.team === team)
-        );
-        teamPlayers.set(playerId, { ...player, team, position });
-
-        const topHeight =
-          50 * (teamPlayers.size - 1) + REAL_BOARD_SIZE.height / 2;
-
-        [...teamPlayers].forEach(([teamPlayerId, teamPlayer], index) => {
-          newPlayers.set(teamPlayerId, {
-            ...teamPlayer,
-            position: { x: teamPlayer.position.x, y: topHeight - index * 100 },
-          });
-        });
-      }
-
-      if (game.started || team === PlayerTeam.SPECTATOR)
         newPlayers.set(playerId, { ...player, team, position });
+      } else {
+        newPlayers.set(playerId, { ...player, team });
+
+        newPlayers = resetPositions(newPlayers);
+      }
 
       return { ...prev, players: newPlayers };
     });
@@ -110,6 +143,7 @@ export const useGame = () => {
 
       setTimeout(() => {
         addedScore.current = false;
+        const newPlayers = resetPositions(game.players);
         setGame((prev) => ({
           ...prev,
           ball: {
@@ -119,6 +153,7 @@ export const useGame = () => {
               y: REAL_BOARD_SIZE.height / 2,
             },
           },
+          players: newPlayers,
         }));
       }, 3000);
     }

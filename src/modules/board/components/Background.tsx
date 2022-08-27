@@ -130,7 +130,7 @@ const Background = () => {
 
         // REMOVE WHITE LINES
         ctx.beginPath();
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 7;
         ctx.strokeStyle = '#5A9D61';
 
         ctx.moveTo(

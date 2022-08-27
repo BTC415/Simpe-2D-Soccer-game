@@ -304,6 +304,8 @@ export const useAdminGame = (
       });
 
       removePlayer(id);
+      players.current.delete(id);
+      setPlayersState(players.current);
     };
     socket.on('player_left', handlePlayerRemove);
 
