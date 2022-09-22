@@ -64,9 +64,30 @@ const Movables = () => {
             setBallPosition(dataTyped.ballPosition);
           } else if (parsedData.type === DataType.GAME) {
             const gameFromAdmin = (parsedData as GameData).game;
+            const playersFromAdmin = new Map(gameFromAdmin.players);
+
+            const oldMe = game.players.get(socket.id);
+            const newMe = playersFromAdmin.get(socket.id);
+
+            if (oldMe && oldMe?.team !== newMe?.team) {
+              if (newMe?.team === PlayerTeam.SPECTATOR)
+                toast('You are now spectator', {
+                  type: 'info',
+                });
+              else if (oldMe)
+                toast(
+                  `You are now in ${
+                    newMe?.team === PlayerTeam.RED ? 'red' : 'blue'
+                  } team`,
+                  {
+                    type: 'info',
+                  }
+                );
+            }
+
             setGame({
               ...gameFromAdmin,
-              players: new Map(gameFromAdmin.players),
+              players: playersFromAdmin,
             });
           } else if (parsedData.type === DataType.PLAYER_JOIN_LEFT) {
             const typedData = parsedData as PlayerJoinLeftData;
@@ -91,7 +112,7 @@ const Movables = () => {
     }
 
     return () => {};
-  }, [admin.id, adminPeer, setGame]);
+  }, [admin.id, adminPeer, game.players, setGame]);
 
   const finalPlayersPositions =
     admin.id === socket.id ? adminPlayersPositions : playersPositions;
