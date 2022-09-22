@@ -23,15 +23,19 @@ export const useKeysDirection = () => {
 
       switch (e.key) {
         case 'w':
+        case 'W':
           setDirection((prev) => ({ ...prev, y: -1 }));
           break;
         case 's':
+        case 'S':
           setDirection((prev) => ({ ...prev, y: 1 }));
           break;
         case 'a':
+        case 'A':
           setDirection((prev) => ({ ...prev, x: -1 }));
           break;
         case 'd':
+        case 'D':
           setDirection((prev) => ({ ...prev, x: 1 }));
           break;
         default:
@@ -42,15 +46,19 @@ export const useKeysDirection = () => {
     const handleKeyUp = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'w':
+        case 'W':
           if (direction.y === -1) setDirection((prev) => ({ ...prev, y: 0 }));
           break;
         case 's':
+        case 'S':
           if (direction.y === 1) setDirection((prev) => ({ ...prev, y: 0 }));
           break;
         case 'a':
+        case 'A':
           if (direction.x === -1) setDirection((prev) => ({ ...prev, x: 0 }));
           break;
         case 'd':
+        case 'D':
           if (direction.x === 1) setDirection((prev) => ({ ...prev, x: 0 }));
           break;
         default:

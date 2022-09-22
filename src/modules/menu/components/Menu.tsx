@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -18,6 +20,20 @@ const Menu = () => {
   const { closeModal } = useModal();
 
   const { gameId } = useRouter().query;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Escape') {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [closeModal]);
 
   return (
     <div>
