@@ -164,10 +164,15 @@ const Movables = () => {
 
       ctx.fillStyle = '#fff';
       ctx.strokeStyle = '#000';
-      finalPlayers.forEach(({ name, team }, id) => {
+      finalPlayers.forEach(({ name, team, index }, id) => {
         if (!finalPlayersPositions[id] || team === PlayerTeam.SPECTATOR) return;
         const [x, y] = finalPlayersPositions[id];
 
+        ctx.font = 'bold 32px Montserrat';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(index.toString(), x, y + 2);
+
+        ctx.font = 'bold 16px Montserrat';
         ctx.fillText(name, x, y + PLAYER_SIZE + 20);
       });
     }
