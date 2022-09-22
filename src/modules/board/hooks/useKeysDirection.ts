@@ -20,6 +20,7 @@ export const useKeysDirection = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
+
       switch (e.key) {
         case 'w':
           setDirection((prev) => ({ ...prev, y: -1 }));
@@ -64,7 +65,7 @@ export const useKeysDirection = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  });
+  }, [direction.x, direction.y]);
 
   useEffect(() => {
     if (admin.id !== socket.id) {
