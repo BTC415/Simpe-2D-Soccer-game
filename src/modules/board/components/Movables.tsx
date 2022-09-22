@@ -124,27 +124,26 @@ const Movables = () => {
     admin.id === socket.id ? adminBallPosition : ballPosition;
 
   useEffect(() => {
+    const cameraPosition = {
+      x: BOARD_SIZE.width / 2 + PLAYER_SIZE * 2,
+      y: BOARD_SIZE.height / 2 + PLAYER_SIZE * 2,
+    };
+
     if (finalPlayers.get(socket.id)?.team === PlayerTeam.SPECTATOR) {
       const spectatingPosition = finalPlayersPositions[spectating];
 
-      if (spectatingPosition)
-        setPosition({
-          x: spectatingPosition[0],
-          y: spectatingPosition[1],
-        });
-      else
-        setPosition({
-          x: BOARD_SIZE.width / 2 + PLAYER_SIZE * 2,
-          y: BOARD_SIZE.height / 2 + PLAYER_SIZE * 2,
-        });
+      if (spectatingPosition) {
+        [cameraPosition.x, cameraPosition.y] = spectatingPosition;
+      }
     } else {
       const myPosition = finalPlayersPositions[socket.id];
-      if (
-        myPosition &&
-        (myPosition[0] !== position.x || myPosition[1] !== position.y)
-      )
-        setPosition({ x: myPosition[0], y: myPosition[1] });
+      if (myPosition) {
+        [cameraPosition.x, cameraPosition.y] = myPosition;
+      }
     }
+
+    if (position.x !== cameraPosition.x && position.y !== cameraPosition.y)
+      setPosition(cameraPosition);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalPlayersPositions, finalPlayers]);
