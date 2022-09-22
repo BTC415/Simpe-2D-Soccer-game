@@ -59,8 +59,8 @@ export const handleBallPosition = (
       const unitY = distanceY / length;
 
       newBall.velocityVector = {
-        x: unitX * 5.5,
-        y: unitY * 5.5,
+        x: unitX * 4,
+        y: unitY * 4,
       };
     } else if (length < COLLISION_DISTANCE + 1) {
       const unitX = distanceX / length;

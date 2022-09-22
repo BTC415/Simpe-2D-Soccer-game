@@ -33,6 +33,6 @@ export const MOVE = {
 
 export const MOVE_BALL = {
   MAX_SPEED: 5,
-  ACCELERATION: 0.5,
-  DECELERATION: 0.015,
+  ACCELERATION: 0.35,
+  DECELERATION: 0.03,
 };
