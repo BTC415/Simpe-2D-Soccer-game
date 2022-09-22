@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 
 import {
   BALL_SIZE,
+  BOARD_SIZE,
   PLAYER_SIZE,
   REAL_BOARD_SIZE,
   SHOOT_DISTANCE,
@@ -27,6 +28,7 @@ import { useKeysDirection } from '../hooks/useKeysDirection';
 import { usePeersConnect } from '../hooks/usePeersConnect';
 import { useShoot } from '../hooks/useShoot';
 import BallTracker from './BallTracker';
+import SpectateControls from './SpectateControls';
 
 const Movables = () => {
   const { setPosition, camX, camY, position } = useCamera();
@@ -42,6 +44,7 @@ const Movables = () => {
   const [ballPosition, setBallPosition] = useState<[number, number]>([
     100, 100,
   ]);
+  const [spectating, setSpectating] = useState(socket.id);
 
   const direction = useKeysDirection();
   const shoot = useShoot();
@@ -114,22 +117,37 @@ const Movables = () => {
     return () => {};
   }, [admin.id, adminPeer, game.players, setGame]);
 
+  const finalPlayers = admin.id === socket.id ? adminPlayers : game.players;
   const finalPlayersPositions =
     admin.id === socket.id ? adminPlayersPositions : playersPositions;
-  const finalPlayers = admin.id === socket.id ? adminPlayers : game.players;
   const finalBallPosition =
     admin.id === socket.id ? adminBallPosition : ballPosition;
 
   useEffect(() => {
-    const myPosition = finalPlayersPositions[socket.id];
-    if (
-      myPosition &&
-      (myPosition[0] !== position.x || myPosition[1] !== position.y)
-    )
-      setPosition({ x: myPosition[0], y: myPosition[1] });
+    if (finalPlayers.get(socket.id)?.team === PlayerTeam.SPECTATOR) {
+      const spectatingPosition = finalPlayersPositions[spectating];
+
+      if (spectatingPosition)
+        setPosition({
+          x: spectatingPosition[0],
+          y: spectatingPosition[1],
+        });
+      else
+        setPosition({
+          x: BOARD_SIZE.width / 2 + PLAYER_SIZE * 2,
+          y: BOARD_SIZE.height / 2 + PLAYER_SIZE * 2,
+        });
+    } else {
+      const myPosition = finalPlayersPositions[socket.id];
+      if (
+        myPosition &&
+        (myPosition[0] !== position.x || myPosition[1] !== position.y)
+      )
+        setPosition({ x: myPosition[0], y: myPosition[1] });
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finalPlayersPositions]);
+  }, [finalPlayersPositions, finalPlayers]);
 
   if (ref.current) {
     const ctx = ref.current.getContext('2d');
@@ -201,6 +219,12 @@ const Movables = () => {
 
   return (
     <>
+      {finalPlayers.get(socket.id)?.team === PlayerTeam.SPECTATOR && (
+        <SpectateControls
+          setSpectating={(id) => setSpectating(id)}
+          spectating={spectating}
+        />
+      )}
       <BallTracker ballPosition={finalBallPosition} />
       <canvas
         ref={ref}

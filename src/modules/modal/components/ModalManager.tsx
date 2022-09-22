@@ -51,7 +51,7 @@ const ModalManager = ({
     <modalContext.Provider value={{ modal, openModal, closeModal }}>
       <Portal>
         <motion.div
-          className="z-40 flex min-h-full w-full items-center justify-center bg-black/60 backdrop-blur-md"
+          className="z-[999] flex min-h-full w-full items-center justify-center bg-black/60 backdrop-blur-md"
           onClick={() => userClose && closeModal()}
           variants={bgAnimation}
           initial="closed"
