@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 
-import axios from 'axios';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 
@@ -11,21 +10,12 @@ import GameInfo from '@/modules/gameInfo';
 import EnterName from '@/modules/joinlink';
 import { Toggler } from '@/modules/menu';
 import { useModal } from '@/modules/modal';
-// import Flag from 'react-world-flags';
 
 const GamePage: NextPage = () => {
   const { game } = useGame();
   const { openModal } = useModal();
 
   const router = useRouter();
-
-  // const [code, setCode] = useState('');
-
-  useEffect(() => {
-    axios.get('https://ipapi.co/json/').then((_response) => {
-      // setCode(response.data.country_code_iso3);
-    });
-  }, []);
 
   useEffect(() => {
     const { gameId } = router.query;
