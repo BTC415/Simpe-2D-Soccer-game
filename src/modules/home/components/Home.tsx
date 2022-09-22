@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { toast } from 'react-toastify';
+
 import { DEFAULT_GAME } from '@/common/context/gameContext';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
@@ -17,6 +19,8 @@ const Home = () => {
   const [name, setName] = useState('');
 
   useEffect(() => {
+    toast.dismiss();
+
     setName(localStorage.getItem('name') || '');
 
     closeModal();
