@@ -40,6 +40,10 @@ export const usePeersConnect = () => {
           console.log(err);
           reject(err);
         });
+
+        setTimeout(() => {
+          reject();
+        }, 15000);
       });
 
       const finalName = getName(id, { game, names }, name).name;
