@@ -39,6 +39,10 @@ const makeEasyPositions = (players: Map<string, Player>) => {
   return easyPositions;
 };
 
+let blocked = true;
+let teamUnblocked = PlayerTeam.SPECTATOR;
+let prevScores = [0, 0];
+
 export const useAdminGame = (
   names: Map<string, string>,
   { direction, shoot }: { direction: Direction; shoot: boolean }
@@ -59,7 +63,7 @@ export const useAdminGame = (
     endGame,
     addScore,
   } = useGame();
-  const { admin } = game;
+  const { admin, scores } = game;
   const { peers } = usePeers();
 
   const players = useRef<Map<string, Player>>(new Map());
@@ -87,7 +91,13 @@ export const useAdminGame = (
         if (!game.paused && game.started && !game.results) {
           [ball.current, players.current] = handleAllPhysics(
             { ball: ball.current, players: players.current },
-            reverse
+            reverse,
+            blocked,
+            teamUnblocked,
+            () => {
+              blocked = false;
+              teamUnblocked = PlayerTeam.SPECTATOR;
+            }
           );
           setPlayersState(players.current);
           setBallState(ball.current);
@@ -127,6 +137,24 @@ export const useAdminGame = (
   }, [admin.id, game, gameId, peers, setGame]);
 
   useEffect(() => {
+    setTimeout(() => {
+      blocked = true;
+
+      if (scores[0] > prevScores[0]) teamUnblocked = PlayerTeam.RED;
+      else if (scores[1] > prevScores[1]) teamUnblocked = PlayerTeam.BLUE;
+    }, 3000);
+
+    return () => {
+      prevScores = scores;
+    };
+  }, [scores]);
+
+  useEffect(() => {
+    blocked = true;
+    teamUnblocked = PlayerTeam.SPECTATOR;
+  }, [game.started]);
+
+  useEffect(() => {
     let updateGame: NodeJS.Timeout;
     if (socket.id === admin.id && game.started && !game.results)
       updateGame = setInterval(() => {
@@ -134,7 +162,7 @@ export const useAdminGame = (
           ...prev,
           players: players.current,
           id: gameId?.toString() || '',
-          secondsLeft: prev.secondsLeft - 1,
+          secondsLeft: !blocked ? prev.secondsLeft - 1 : prev.secondsLeft,
         }));
       }, 1000);
 

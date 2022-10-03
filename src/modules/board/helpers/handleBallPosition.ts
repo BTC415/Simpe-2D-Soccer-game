@@ -12,7 +12,8 @@ import { makeBallPosition, makePosition } from './makePosition';
 export const handleBallPosition = (
   ball: Ball,
   players: Map<string, Player>,
-  reverse: boolean
+  reverse: boolean,
+  callback: () => void
 ): [Ball, Map<string, Player>] => {
   const newBall = ball;
   const newPlayers = new Map(players);
@@ -55,6 +56,7 @@ export const handleBallPosition = (
       playerCollision.shoot &&
       length < COLLISION_DISTANCE + SHOOT_DISTANCE + 1
     ) {
+      callback();
       const unitX = distanceX / length;
       const unitY = distanceY / length;
 
@@ -63,6 +65,7 @@ export const handleBallPosition = (
         y: unitY * 4,
       };
     } else if (length < COLLISION_DISTANCE + 1) {
+      callback();
       const unitX = distanceX / length;
       const unitY = distanceY / length;
 

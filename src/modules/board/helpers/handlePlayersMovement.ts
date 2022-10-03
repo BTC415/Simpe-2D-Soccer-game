@@ -1,11 +1,19 @@
-import { MOVE, PLAYER_SIZE } from '@/common/constants/settings';
+import {
+  BOARD_SIZE,
+  MOVE,
+  MOVE_AREA_SIZE,
+  PLAYER_SIZE,
+  REAL_BOARD_SIZE,
+} from '@/common/constants/settings';
 import { Player, PlayerTeam } from '@/common/types/player.type';
 
 import { makePosition } from './makePosition';
 
 export const handlePlayersMovement = (
   players: Map<string, Player>,
-  reverse: boolean
+  reverse: boolean,
+  blocked: boolean,
+  teamUnblocked: PlayerTeam
 ): Map<string, Player> => {
   const newPlayers = new Map(players);
 
@@ -79,6 +87,72 @@ export const handlePlayersMovement = (
         });
       }
     });
+
+    const bigCircle = {
+      x: BOARD_SIZE.width / 2 + MOVE_AREA_SIZE,
+      y: BOARD_SIZE.height / 2 + MOVE_AREA_SIZE,
+      radius: 125,
+    };
+
+    if (blocked) {
+      if (
+        player.team === PlayerTeam.RED &&
+        (teamUnblocked !== PlayerTeam.RED ||
+          newPosition.y + PLAYER_SIZE >
+            BOARD_SIZE.height / 2 + MOVE_AREA_SIZE + bigCircle.radius + 5 ||
+          newPosition.y - PLAYER_SIZE <
+            BOARD_SIZE.height / 2 + MOVE_AREA_SIZE - bigCircle.radius - 5)
+      ) {
+        newPosition.x = Math.max(
+          newPosition.x,
+          REAL_BOARD_SIZE.width / 2 + PLAYER_SIZE
+        );
+      } else if (
+        player.team === PlayerTeam.BLUE &&
+        (teamUnblocked !== PlayerTeam.BLUE ||
+          newPosition.y + PLAYER_SIZE >
+            BOARD_SIZE.height / 2 + MOVE_AREA_SIZE + bigCircle.radius + 5 ||
+          newPosition.y - PLAYER_SIZE <
+            BOARD_SIZE.height / 2 + MOVE_AREA_SIZE - bigCircle.radius - 5)
+      ) {
+        newPosition.x = Math.min(
+          newPosition.x,
+          REAL_BOARD_SIZE.width / 2 - PLAYER_SIZE
+        );
+      }
+    }
+
+    const distanceX = newPosition.x - bigCircle.x;
+    const distanceY = newPosition.y - bigCircle.y;
+    const length = Math.sqrt(distanceX ** 2 + distanceY ** 2) || 1;
+
+    if (teamUnblocked !== PlayerTeam.SPECTATOR) {
+      if (
+        length <= bigCircle.radius + PLAYER_SIZE &&
+        player.team !== teamUnblocked &&
+        blocked
+      ) {
+        const unitX = distanceX / length;
+        const unitY = distanceY / length;
+
+        newPosition.x = bigCircle.x + (bigCircle.radius + PLAYER_SIZE) * unitX;
+        newPosition.y = bigCircle.y + (bigCircle.radius + PLAYER_SIZE) * unitY;
+      } else if (
+        length >= bigCircle.radius - PLAYER_SIZE &&
+        length <= bigCircle.radius + PLAYER_SIZE &&
+        player.team === teamUnblocked &&
+        blocked &&
+        (player.team === PlayerTeam.RED
+          ? position.x < BOARD_SIZE.width / 2 + MOVE_AREA_SIZE
+          : position.x > BOARD_SIZE.width / 2 + MOVE_AREA_SIZE)
+      ) {
+        const unitX = distanceX / length;
+        const unitY = distanceY / length;
+
+        newPosition.x = bigCircle.x + (bigCircle.radius - PLAYER_SIZE) * unitX;
+        newPosition.y = bigCircle.y + (bigCircle.radius - PLAYER_SIZE) * unitY;
+      }
+    }
 
     newPlayers.set(id, {
       ...player,
