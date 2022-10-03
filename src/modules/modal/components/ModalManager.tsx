@@ -65,7 +65,7 @@ const ModalManager = ({
                 animate="opened"
                 exit="exited"
                 onClick={(e) => e.stopPropagation()}
-                className="relative flex w-full max-w-[20rem] flex-col items-center rounded-lg bg-zinc-900 p-6 sm:w-auto sm:min-w-[20rem] sm:max-w-none"
+                className="relative flex w-full flex-col items-center rounded-lg bg-zinc-900 p-6 sm:w-auto sm:min-w-[20rem] sm:max-w-none"
               >
                 {userClose && (
                   <button
