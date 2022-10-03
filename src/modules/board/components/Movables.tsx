@@ -142,7 +142,7 @@ const Movables = () => {
       }
     }
 
-    if (position.x !== cameraPosition.x && position.y !== cameraPosition.y)
+    if (position.x !== cameraPosition.x || position.y !== cameraPosition.y)
       setPosition(cameraPosition);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
