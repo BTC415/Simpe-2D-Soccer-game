@@ -29,4 +29,9 @@ export const ICE_SERVERS: RTCIceServer[] = [
     credential: 'webrtc',
     username: 'webrtc',
   },
+  {
+    urls: 'turn:openrelay.metered.ca:80',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
 ];
