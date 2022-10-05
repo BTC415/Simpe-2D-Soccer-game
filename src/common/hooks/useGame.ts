@@ -124,6 +124,7 @@ export const useGame = () => {
         scores: [0, 0],
         started: false,
         results: false,
+        paused: false,
       };
     });
   };
@@ -145,6 +146,7 @@ export const useGame = () => {
         players: newPlayers,
         secondsLeft: 300,
         results: true,
+        paused: false,
       };
     });
   };
@@ -161,6 +163,7 @@ export const useGame = () => {
         },
         velocityVector: { x: 0, y: 0 },
       },
+      paused: false,
     }));
   };
 

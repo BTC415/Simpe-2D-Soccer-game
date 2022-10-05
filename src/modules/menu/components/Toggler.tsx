@@ -1,12 +1,37 @@
+import { useEffect } from 'react';
+
 import { FiMenu } from 'react-icons/fi';
 
 import { PLAYER_SIZE } from '@/common/constants/settings';
+import { useGame } from '@/common/hooks/useGame';
 import { useModal } from '@/modules/modal';
 
 import Menu from './Menu';
 
 const Toggler = () => {
-  const { openModal } = useModal();
+  const { openModal, closeModal, modal } = useModal();
+  const {
+    game: { started },
+  } = useGame();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Escape' && started) {
+        if (modal) {
+          closeModal();
+          (document.activeElement as HTMLElement).blur();
+        } else {
+          openModal(<Menu />);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [closeModal, modal, openModal, started]);
 
   return (
     <div className="absolute bottom-0 left-0 z-20 w-full">
