@@ -84,7 +84,7 @@ const Team = ({ team }: { team: PlayerTeam }) => {
 
 const TeamSelect = () => {
   return (
-    <div className="mt-5 flex gap-5">
+    <div className="mt-2 flex gap-5">
       <Team team={PlayerTeam.BLUE} />
       <Team team={PlayerTeam.SPECTATOR} />
       <Team team={PlayerTeam.RED} />

@@ -43,6 +43,14 @@ const Menu = () => {
         Room id: <span className="font-bold text-green-500">{gameId}</span>
       </p>
 
+      <p className="mt-3 text-center text-lg font-bold text-yellow-300">
+        {game.admin.id === socket.id && game.started && 'You are the host'}
+        {game.started &&
+          game.admin.id !== socket.id &&
+          "You can't change your team when the game is running"}
+        {!game.started && 'Click on a team name to join'}
+      </p>
+
       <TeamSelect />
 
       <div className="mt-5 flex justify-end gap-5">
