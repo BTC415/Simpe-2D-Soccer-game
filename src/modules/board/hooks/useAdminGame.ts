@@ -42,6 +42,7 @@ const makeEasyPositions = (players: Map<string, Player>) => {
 let blocked = true;
 let teamUnblocked = PlayerTeam.SPECTATOR;
 let prevScores = [0, 0];
+let blockedGoal = false;
 
 export const useAdminGame = (
   names: Map<string, string>,
@@ -104,13 +105,24 @@ export const useAdminGame = (
 
           reverse = !reverse;
 
-          if (ball.current.position.x + BALL_SIZE < MOVE_AREA_SIZE)
-            addScore(PlayerTeam.RED);
-          else if (
-            ball.current.position.x - BALL_SIZE >
-            REAL_BOARD_SIZE.width - MOVE_AREA_SIZE
-          )
-            addScore(PlayerTeam.BLUE);
+          if (!blockedGoal) {
+            if (ball.current.position.x + BALL_SIZE < MOVE_AREA_SIZE) {
+              addScore(PlayerTeam.RED);
+              blockedGoal = true;
+              setTimeout(() => {
+                blockedGoal = false;
+              }, 5000);
+            } else if (
+              ball.current.position.x - BALL_SIZE >
+              REAL_BOARD_SIZE.width - MOVE_AREA_SIZE
+            ) {
+              addScore(PlayerTeam.BLUE);
+              blockedGoal = true;
+              setTimeout(() => {
+                blockedGoal = false;
+              }, 5000);
+            }
+          }
         }
 
         peers.forEach((peer) => {
