@@ -6,6 +6,7 @@ import { DEFAULT_GAME } from '@/common/context/gameContext';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
+import { Help } from '@/modules/menu';
 import { useModal } from '@/modules/modal';
 
 import GameInputs from './GameInputs';
@@ -14,7 +15,7 @@ import Header from './Header';
 const Home = () => {
   const { setGame } = useGame();
   const { setPeers, peers } = usePeers();
-  const { closeModal } = useModal();
+  const { closeModal, openModal } = useModal();
 
   const [name, setName] = useState('');
 
@@ -36,6 +37,13 @@ const Home = () => {
     <div className="flex justify-center py-24">
       <div className="flex w-max flex-col items-center">
         <Header />
+
+        <button
+          className="mb-5 rounded-lg text-2xl font-bold text-yellow-300 transition-transform hover:scale-105 active:scale-100"
+          onClick={() => openModal(<Help />)}
+        >
+          How to play?
+        </button>
 
         <label>
           <p>Enter your name</p>
