@@ -72,17 +72,20 @@ const BallTracker = ({ ballPosition }: { ballPosition: [number, number] }) => {
         const unit = { x: distanceX / length, y: distanceY / length };
 
         ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(
-          position.x + unit.x * 60,
-          position.y + unit.y * 60,
-          5,
-          0,
-          Math.PI * 2
+        const x = position.x + unit.x * 75;
+        const y = position.y + unit.y * 75;
+
+        const p = new Path2D(
+          'M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z'
         );
-        ctx.fill();
-        ctx.stroke();
-        ctx.closePath();
+
+        const rotate =
+          Math.atan2(ballPosition[1] - y, ballPosition[0] - x) + 0.785398;
+
+        ctx.translate(x, y);
+        ctx.rotate(rotate);
+        ctx.fill(p);
+        ctx.stroke(p);
       }
     }
   }
