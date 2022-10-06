@@ -1,5 +1,6 @@
 import {
   BALL_SIZE,
+  MOVE,
   MOVE_BALL,
   PLAYER_SIZE,
   SHOOT_DISTANCE,
@@ -20,16 +21,26 @@ export const handleBallPosition = (
 
   const { velocityVector, position } = newBall;
 
+  const decelerationX =
+    velocityVector.x > 4 || velocityVector.x < -4
+      ? MOVE_BALL.DECELERATION
+      : MOVE_BALL.SMALL_DECELERATION;
+
   if (velocityVector.x > 0) {
-    velocityVector.x = Math.max(velocityVector.x - MOVE_BALL.DECELERATION, 0);
+    velocityVector.x = Math.max(velocityVector.x - decelerationX, 0);
   } else if (velocityVector.x < 0) {
-    velocityVector.x = Math.min(velocityVector.x + MOVE_BALL.DECELERATION, 0);
+    velocityVector.x = Math.min(velocityVector.x + decelerationX, 0);
   }
 
+  const decelerationY =
+    velocityVector.y > 3 || velocityVector.y < -3
+      ? MOVE_BALL.DECELERATION
+      : MOVE_BALL.SMALL_DECELERATION;
+
   if (velocityVector.y > 0) {
-    velocityVector.y = Math.max(velocityVector.y - MOVE_BALL.DECELERATION, 0);
+    velocityVector.y = Math.max(velocityVector.y - decelerationY, 0);
   } else if (velocityVector.y < 0) {
-    velocityVector.y = Math.min(velocityVector.y + MOVE_BALL.DECELERATION, 0);
+    velocityVector.y = Math.min(velocityVector.y + decelerationY, 0);
   }
 
   newBall.velocityVector = velocityVector;
@@ -61,8 +72,8 @@ export const handleBallPosition = (
       const unitY = distanceY / length;
 
       newBall.velocityVector = {
-        x: unitX * 4,
-        y: unitY * 4,
+        x: unitX * 11,
+        y: unitY * 11,
       };
     } else if (length < COLLISION_DISTANCE + 1) {
       callback();
@@ -71,11 +82,11 @@ export const handleBallPosition = (
 
       const playerSpeedX = Math.min(
         Math.abs(playerCollision.velocityVector.x * 2 || 1.5),
-        2.5
+        MOVE.MAX_SPEED
       );
       const playerSpeedY = Math.min(
         Math.abs(playerCollision.velocityVector.y * 2 || 1.5),
-        2.5
+        MOVE.MAX_SPEED
       );
 
       const vX = (velocityVector.x - unitX * playerSpeedX) / 10;

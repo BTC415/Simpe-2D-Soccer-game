@@ -1,5 +1,5 @@
 export const BOARD_SIZE = {
-  width: 1700,
+  width: 1500,
   height: 900,
 };
 
@@ -9,7 +9,7 @@ export const LINE_WIDTH = 4;
 
 export const SHOOT_DISTANCE = 7;
 
-export const BALL_SIZE = 23;
+export const BALL_SIZE = 22;
 
 export const MOVE_AREA_SIZE = PLAYER_SIZE * 2 + 5;
 
@@ -26,7 +26,7 @@ export const GOAL_POSITION = {
 export const TICKRATE = 64;
 
 export const MOVE = {
-  MAX_SPEED: 2.5,
+  MAX_SPEED: 3,
   ACCELERATION: 0.2,
   DECELERATION: 0.05,
 };
@@ -34,5 +34,6 @@ export const MOVE = {
 export const MOVE_BALL = {
   MAX_SPEED: 5,
   ACCELERATION: 0.35,
-  DECELERATION: 0.03,
+  DECELERATION: 0.12,
+  SMALL_DECELERATION: 0.015,
 };

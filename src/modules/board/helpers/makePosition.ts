@@ -39,8 +39,8 @@ export const makeBallPosition = (x: number, y: number) => {
   let maxY = BALL_SIZE + MOVE_AREA_SIZE + LINE_WIDTH;
   let minY = REAL_BOARD_SIZE.height - BALL_SIZE - MOVE_AREA_SIZE - LINE_WIDTH;
   if (
-    x < MOVE_AREA_SIZE + BALL_SIZE - LINE_WIDTH ||
-    x > REAL_BOARD_SIZE.width - MOVE_AREA_SIZE - BALL_SIZE + LINE_WIDTH
+    newX < MOVE_AREA_SIZE + BALL_SIZE - LINE_WIDTH ||
+    newX > REAL_BOARD_SIZE.width - MOVE_AREA_SIZE - BALL_SIZE + LINE_WIDTH
   ) {
     maxY =
       REAL_BOARD_SIZE.height / 2 -
