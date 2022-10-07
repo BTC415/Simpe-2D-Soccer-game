@@ -6,7 +6,7 @@ import { DEFAULT_GAME } from '@/common/context/gameContext';
 import { useGame } from '@/common/hooks/useGame';
 import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
-import { Help } from '@/modules/menu';
+import Help from '@/modules/help';
 import { useModal } from '@/modules/modal';
 
 import GameInputs from './GameInputs';

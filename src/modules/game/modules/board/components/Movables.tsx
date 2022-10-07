@@ -22,10 +22,10 @@ import {
 } from '@/common/types/peer.type';
 import { PlayerTeam } from '@/common/types/player.type';
 
-import { useAdminGame } from '../hooks/useAdminGame';
+import { useAdminGame } from '../../../hooks/useAdminGame';
+import { usePeersConnect } from '../../../hooks/usePeersConnect';
 import { useCamera } from '../hooks/useCamera';
 import { useKeysDirection } from '../hooks/useKeysDirection';
-import { usePeersConnect } from '../hooks/usePeersConnect';
 import { useShoot } from '../hooks/useShoot';
 import BallTracker from './BallTracker';
 import SpectateControls from './SpectateControls';

@@ -10,8 +10,8 @@ import { usePeers } from '@/common/hooks/usePeers';
 import { socket } from '@/common/libs/socket';
 import { StatusPeer } from '@/common/types/game.type';
 import { DataType, PlayerJoinLeftData } from '@/common/types/peer.type';
-import { Loader, Error } from '@/modules/loader';
-import Menu from '@/modules/menu';
+import { Loader, Error } from '@/modules/game/modules/loader';
+import Menu from '@/modules/game/modules/menu';
 import { useModal } from '@/modules/modal';
 
 import { getName } from '../helpers/getName';

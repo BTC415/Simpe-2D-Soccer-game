@@ -5,10 +5,9 @@ import { useRouter } from 'next/router';
 
 import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
-import Board from '@/modules/board';
-import GameInfo from '@/modules/gameInfo';
+import { Board, GameInfo } from '@/modules/game';
+import { Toggler } from '@/modules/game/modules/menu';
 import EnterName from '@/modules/joinlink';
-import { Toggler } from '@/modules/menu';
 import { useModal } from '@/modules/modal';
 
 const GamePage: NextPage = () => {

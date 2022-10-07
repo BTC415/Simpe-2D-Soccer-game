@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { REAL_BOARD_SIZE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
 import { socket } from '@/common/libs/socket';
-import Menu from '@/modules/menu';
+import Menu from '@/modules/game/modules/menu';
 import { useModal } from '@/modules/modal';
-import Results from '@/modules/results';
 
+import Results from '../../results';
 import { playerPositionContext } from '../context/playerPosition';
 import Background from './Background';
 import Movables from './Movables';

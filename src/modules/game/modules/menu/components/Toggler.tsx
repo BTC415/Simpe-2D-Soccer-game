@@ -5,9 +5,9 @@ import { FiMenu } from 'react-icons/fi';
 
 import { PLAYER_SIZE } from '@/common/constants/settings';
 import { useGame } from '@/common/hooks/useGame';
+import Help from '@/modules/help';
 import { useModal } from '@/modules/modal';
 
-import Help from './Help';
 import Menu from './Menu';
 
 const Toggler = () => {
