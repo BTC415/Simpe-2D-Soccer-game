@@ -15,6 +15,11 @@ const App = ({ Component, pageProps }: AppProps) => {
       <Head>
         <title>BALLZONE - play now!</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta
+          name="description"
+          content="2D (top-down perspective) real-time game with 2 teams where players try to score a goal and win (like in soccer or hockey)."
+        />
+        <meta name="keywords" content="ball, game, soccer, football" />
       </Head>
       <ToastContainer theme="dark" />
       <MotionConfig transition={{ ease: [0.6, 0.01, -0.05, 0.9] }}>
