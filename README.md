@@ -17,14 +17,12 @@ https://ballzone.herokuapp.com
 Install like others Next.js apps using yarn
 ## Screenshots
 
-![front_page_animate](https://media2.giphy.com/media/qCWAY6ILkXE6Plr4rW/giphy.gif?cid=790b7611a078032ce2fad39ca45eb37c0493f0fdb51c870f&rid=giphy.gif&ct=g)
+Youtube video of gameplay: https://www.youtube.com/watch?v=Uq3MUy2VrOs
 
-![Home](https://i.imgur.com/VuoWLa9.png)
+![gameplay](https://media.giphy.com/media/6gP8KN2EC7ViMPEvH1/giphy.gif)
 
-![Game menu](https://i.imgur.com/oJdPvH1.png)
+![Home](https://i.imgur.com/vtZBfcx.png)
 
-![Game](https://i.imgur.com/F0bmGg5.png)
+![Game menu](https://i.imgur.com/EEY5vVu.png)
 
-![Game 2](https://i.imgur.com/1z4MtRU.png)
-
-![Score](https://i.imgur.com/5OAlEIB.png)
+![Game](https://i.imgur.com/R6zrWCd.png)
